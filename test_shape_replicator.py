@@ -20,13 +20,13 @@ class ShapeReplicatorTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             output = Path(tmp) / "shapes.svg"
-            export_shapes_to_svg(replicas, output)
+            export_shapes_to_svg(replicas, output, padding=0)
             content = output.read_text(encoding="utf-8")
 
         self.assertIn("<svg", content)
         self.assertEqual(content.count("<polygon"), 2)
-        self.assertIn('points="10,10 12,10 11,12"', content)
-        self.assertIn('points="13,10 15,10 14,12"', content)
+        self.assertIn('points="0,0 2,0 1,2"', content)
+        self.assertIn('points="3,0 5,0 4,2"', content)
 
 
 if __name__ == "__main__":

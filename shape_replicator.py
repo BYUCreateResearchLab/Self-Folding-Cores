@@ -116,6 +116,9 @@ if __name__ == "__main__":
     try:
         fig, _ = plot_shapes(copies)
         fig.savefig("replicated_shapes_plot.svg", format="svg")
+        import matplotlib.pyplot as plt
+
+        plt.close(fig)
     except ImportError:
         pass
 
