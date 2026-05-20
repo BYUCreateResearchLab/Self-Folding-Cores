@@ -46,7 +46,7 @@ def replicate_shape(
 
 
 def plot_shapes(shapes: Iterable[Shape], title: str = "Replicated Shapes"):
-    """Plot shapes using matplotlib and return (fig, ax)."""
+    """Plot shapes using matplotlib and return (fig, ax, plt)."""
     try:
         import matplotlib.pyplot as plt
     except ImportError as exc:  # pragma: no cover - environment dependent
@@ -59,7 +59,7 @@ def plot_shapes(shapes: Iterable[Shape], title: str = "Replicated Shapes"):
         ax.plot(xs, ys)
     ax.set_aspect("equal", adjustable="box")
     ax.set_title(title)
-    return fig, ax
+    return fig, ax, plt
 
 
 def export_shapes_to_svg(
@@ -116,10 +116,8 @@ if __name__ == "__main__":
 
     # Graph the shapes if matplotlib is available
     try:
-        fig, _ = plot_shapes(copies)
+        fig, _, plt = plot_shapes(copies)
         fig.savefig("replicated_shapes_plot.svg", format="svg")
-        import matplotlib.pyplot as plt
-
         plt.close(fig)
     except ImportError:
         pass
