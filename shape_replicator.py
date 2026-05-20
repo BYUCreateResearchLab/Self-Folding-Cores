@@ -46,7 +46,7 @@ def plot_shapes(shapes: Iterable[Shape], title: str = "Replicated Shapes"):
     try:
         import matplotlib.pyplot as plt
     except ImportError as exc:  # pragma: no cover - environment dependent
-        raise ImportError("matplotlib is required to graph shapes") from exc
+        raise ImportError("matplotlib is required to plot shapes") from exc
 
     fig, ax = plt.subplots()
     for shape in shapes:
