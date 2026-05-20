@@ -69,12 +69,12 @@ def create_grid(filename, cols, rows, cell_size, margin):
     print(f"Successfully saved optimized file to {filename}")
 
 if __name__ == "__main__":
-    OUTPUT_FILE = "origami_parametric.svg"
-    
+    OUTPUT_FILE = "SVGs/origami_parametric.svg"
+
     # --- ADJUSTABLE VARIABLES ---
     GRID_COLS = 11      # Number of cells wide (keep odd for clean borders)
     GRID_ROWS = 11      # Number of cells high (keep odd for clean borders)
     CELL_SIZE = 7.5    # Base size of the grid cell in mm
     MARGIN = 0.75        # Gap from the edge (Total gap between pieces = 2x this value)
-    
+
     create_grid(OUTPUT_FILE, GRID_COLS, GRID_ROWS, CELL_SIZE, MARGIN)

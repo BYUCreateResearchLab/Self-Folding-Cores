@@ -51,36 +51,41 @@ def create_tabbed_parametric_grid(filename, cols, rows, cell_size, margin, tab_w
                     path_d = f"M {x + margin} {y + cell_size} L {x + margin} {y + margin} L {x + margin + rect_width} {y + margin} L {x + margin + rect_width} {y + cell_size}"
                     dwg.add(dwg.path(d=path_d, **stroke_style))
 
-            # 4. Alternating Straight-Line Tabs (Odd Row, Odd Col)
+            # 4. Alternating X-Tab Pattern (Odd Row, Odd Col)
             elif row % 2 != 0 and col % 2 != 0:
-                r_gap = row // 2
-                c_gap = col // 2
-                
-                is_tl_large = (r_gap + c_gap) % 2 == 0
-                is_tr_large = not is_tl_large
-                
                 C = tab_width / math.sqrt(2)
-                
-                if (r_gap + c_gap) % 2 == 0:
-                    # Draw \ (Top-Left to Bottom-Right)
-                    tl_x = x if is_tl_large else x - margin
-                    tl_y = y if is_tl_large else y - margin
-                    br_x = x + cell_size if is_tl_large else x + cell_size + margin
-                    br_y = y + cell_size if is_tl_large else y + cell_size + margin
-                    
-                    dwg.add(dwg.line(start=(tl_x + C, tl_y), end=(br_x, br_y - C), **stroke_style))
-                    dwg.add(dwg.line(start=(tl_x, tl_y + C), end=(br_x - C, br_y), **stroke_style))
-                else:
-                    # Draw / (Top-Right to Bottom-Left)
-                    tr_x = x + cell_size if is_tr_large else x + cell_size + margin
-                    tr_y = y if is_tr_large else y - margin
-                    bl_x = x if is_tr_large else x - margin
-                    bl_y = y + cell_size if is_tr_large else y + cell_size + margin
-                    
-                    dwg.add(dwg.line(start=(tr_x - C, tr_y), end=(bl_x, bl_y - C), **stroke_style))
-                    dwg.add(dwg.line(start=(tr_x, tr_y + C), end=(bl_x + C, bl_y), **stroke_style))
+                trim = tab_width / math.sqrt(2)
+
+                # Big square coordinates
+                big_tl_x, big_tl_y = x, y
+                big_br_x, big_br_y = x + cell_size, y + cell_size
+                big_tr_x, big_tr_y = x + cell_size, y
+                big_bl_x, big_bl_y = x, y + cell_size
+
+                # Small square coordinates
+                small_tl_x, small_tl_y = x + margin, y + margin
+                small_br_x, small_br_y = x + cell_size - margin, y + cell_size - margin
+                small_tr_x, small_tr_y = x + cell_size - margin, y + margin
+                small_bl_x, small_bl_y = x + margin, y + cell_size - margin
+
+                # Diagonal 1: Big square \ and Small square /
+                # Two parallel lines for big square diagonal (top-left to bottom-right)
+                # Line A: trim from both ends by moving toward center
+                dwg.add(dwg.line(start=(big_tl_x + C + trim, big_tl_y + trim),
+                                end=(big_br_x - trim, big_br_y - C - trim), **stroke_style))
+                # Line B: trim from both ends by moving toward center
+                dwg.add(dwg.line(start=(big_tl_x + trim, big_tl_y + C + trim),
+                                end=(big_br_x - C - trim, big_br_y - trim), **stroke_style))
+
+                # Two parallel lines for small square diagonal (top-right to bottom-left)
+                # Line C: trim from both ends (slope is -1)
+                dwg.add(dwg.line(start=(small_tr_x - C - trim, small_tr_y + trim),
+                                end=(small_bl_x + trim, small_bl_y - C - trim), **stroke_style))
+                # Line D: trim from both ends (slope is -1)
+                dwg.add(dwg.line(start=(small_tr_x - trim, small_tr_y + C + trim),
+                                end=(small_bl_x + C + trim, small_bl_y - trim), **stroke_style))
 
     dwg.save()
 
 if __name__ == "__main__":
-    create_tabbed_parametric_grid("origami_tabs_straight.svg", 11, 11, 15.0, 1.5, 2.0)
+    create_tabbed_parametric_grid("SVGs/origami_tabs_straight.svg", 11, 11, 15.0, 1.5, 2.0)
