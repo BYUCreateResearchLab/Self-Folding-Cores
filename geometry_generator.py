@@ -176,7 +176,7 @@ class TabbedGrid(GeometryGenerator):
         dwg.add(dwg.line(start=(bl_x, bl_y + d), end=(cx, cy + d), **self.stroke_style))
         # From center Right-point up to Top-Right bottom-edge
         dwg.add(dwg.line(start=(cx + d, cy), end=(tr_x + d, tr_y), **self.stroke_style))
-        
+
 def get_next_array_number(folder="SVGs"):
     """Get the next array number based on existing files in the folder."""
     if not os.path.exists(folder):
@@ -199,7 +199,7 @@ def main():
     GRID_ROWS = 11
     CELL_SIZE = 15.0
     MARGIN = 1.5
-    TAB_WIDTH = 1.0
+    TAB_WIDTH = 2.0
 
     next_number = get_next_array_number()
     output_filename = f"SVGs/Array_{next_number}.svg"
