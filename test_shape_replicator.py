@@ -25,6 +25,8 @@ class ShapeReplicatorTests(unittest.TestCase):
 
         self.assertIn("<svg", content)
         self.assertEqual(content.count("<polygon"), 2)
+        self.assertIn('points="10,10 12,10 11,12"', content)
+        self.assertIn('points="13,10 15,10 14,12"', content)
 
 
 if __name__ == "__main__":

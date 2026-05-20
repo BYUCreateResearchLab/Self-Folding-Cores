@@ -20,6 +20,10 @@ class Shape:
         return cls(tuple(points))
 
 
+def _fmt(value: float) -> str:
+    return f"{value:g}"
+
+
 def replicate_shape(
     shape: Shape,
     count: int,
@@ -86,15 +90,17 @@ def export_shapes_to_svg(
     polygons = []
     for shape in shape_list:
         points_str = " ".join(
-            f"{(x - min_x) + padding},{(y - min_y) + padding}" for x, y in shape.points
+            f"{_fmt((x - min_x) + padding)},{_fmt((y - min_y) + padding)}" for x, y in shape.points
         )
         polygons.append(
             f'<polygon points="{points_str}" stroke="{stroke}" fill="{fill}" stroke-width="{stroke_width}" />'
         )
 
+    width_text = _fmt(width)
+    height_text = _fmt(height)
     svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
-        f'viewBox="0 0 {width} {height}">\n'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width_text}" height="{height_text}" '
+        f'viewBox="0 0 {width_text} {height_text}">\n'
         + "\n".join(polygons)
         + "\n</svg>\n"
     )
