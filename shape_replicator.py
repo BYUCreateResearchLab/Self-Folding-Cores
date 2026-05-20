@@ -83,6 +83,8 @@ def export_shapes_to_svg(
 
     width = (max_x - min_x) + 2 * padding
     height = (max_y - min_y) + 2 * padding
+    x_offset = padding - min_x
+    y_offset = padding - min_y
 
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -90,7 +92,7 @@ def export_shapes_to_svg(
     polygons = []
     for shape in shape_list:
         points_str = " ".join(
-            f"{_fmt((x - min_x) + padding)},{_fmt((y - min_y) + padding)}" for x, y in shape.points
+            f"{_fmt(x + x_offset)},{_fmt(y + y_offset)}" for x, y in shape.points
         )
         polygons.append(
             f'<polygon points="{points_str}" stroke="{stroke}" fill="{fill}" stroke-width="{stroke_width}" />'
