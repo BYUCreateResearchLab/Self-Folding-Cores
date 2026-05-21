@@ -180,9 +180,9 @@ def get_next_array_number(folder="SVGs"):
 
 def main():
     GRID_COLS = 15  # Increased slightly to make gradient more noticeable
-    GRID_ROWS = 11
+    GRID_ROWS = 3
     CELL_SIZE = 15.0
-    MIN_MARGIN = 0.5  # Tighter gap on one side
+    MIN_MARGIN = 1.0  # Tighter gap on one side
     MAX_MARGIN = 3.5  # Wider gap on the other side
     TAB_WIDTH = 2.0
 
