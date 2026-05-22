@@ -18,6 +18,7 @@ class VariableGeometryGenerator:
         self.canvas_width = cols * cell_size
         self.canvas_height = rows * cell_size
         self.stroke_style = {'stroke': 'white', 'stroke_width': 0.1, 'fill': 'none'}
+        self.red_stroke_style = {'stroke': 'red', 'stroke_width': 0.1, 'fill': 'none'}
 
     def get_margin(self, row, col):
         """Creates a gradient from min_margin to max_margin."""
@@ -191,6 +192,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     self._draw_x_tabs(dwg, x, y, row, col)
 
         self._draw_boundary_gaps(dwg)
+        self._draw_red_layer(dwg)
         self.save_drawing(dwg)
 
     def _draw_x_tabs(self, dwg, x, y, row, col):
@@ -339,6 +341,126 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                 
                 self.draw_solid_line(dwg, BR, TR_next)
 
+    def _line_intersection(self, p1, p2, p3, p4):
+        x1, y1 = p1
+        x2, y2 = p2
+        x3, y3 = p3
+        x4, y4 = p4
+        
+        denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+        if abs(denom) < 1e-8:
+            return (x1, y1)
+        
+        px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denom
+        py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denom
+        return (px, py)
+
+    def _draw_red_layer(self, dwg):
+        # 1. Red Outer Perimeter
+        points = []
+
+        # Top Boundary
+        row = 0
+        y = 0
+        for col in range(self.cols):
+            x = col * self.cell_size
+            if col % 2 == 0:
+                m = self.get_margin(row, col)
+                points.append((x + m, y + m))
+                points.append((x + self.cell_size - m, y + m))
+            else:
+                m_left = self.get_margin(row, col - 1)
+                m_right = self.get_margin(row, col + 1)
+                points.append((x + m_left, y + m_left))
+                points.append((x + self.cell_size - m_right, y + m_right))
+
+        # Right Boundary
+        col = self.cols - 1
+        x_right = col * self.cell_size + self.cell_size
+        for row in range(self.rows):
+            y = row * self.cell_size
+            if row % 2 == 0:
+                m = self.get_margin(row, col)
+                points.append((x_right - m, y + m))
+                points.append((x_right - m, y + self.cell_size - m))
+            else:
+                m_top = self.get_margin(row - 1, col)
+                m_bottom = self.get_margin(row + 1, col)
+                points.append((x_right - m_top, y + m_top))
+                points.append((x_right - m_bottom, y + self.cell_size - m_bottom))
+
+        # Bottom Boundary
+        row = self.rows - 1
+        y_bottom = row * self.cell_size + self.cell_size
+        for col in range(self.cols - 1, -1, -1):
+            x = col * self.cell_size
+            if col % 2 == 0:
+                m = self.get_margin(row, col)
+                points.append((x + self.cell_size - m, y_bottom - m))
+                points.append((x + m, y_bottom - m))
+            else:
+                m_left = self.get_margin(row, col - 1)
+                m_right = self.get_margin(row, col + 1)
+                points.append((x + self.cell_size - m_right, y_bottom - m_right))
+                points.append((x + m_left, y_bottom - m_left))
+
+        # Left Boundary
+        col = 0
+        x = 0
+        for row in range(self.rows - 1, -1, -1):
+            y = row * self.cell_size
+            if row % 2 == 0:
+                m = self.get_margin(row, col)
+                points.append((x + m, y + self.cell_size - m))
+                points.append((x + m, y + m))
+            else:
+                m_top = self.get_margin(row - 1, col)
+                m_bottom = self.get_margin(row + 1, col)
+                points.append((x + m_bottom, y + self.cell_size - m_bottom))
+                points.append((x + m_top, y + m_top))
+
+        dwg.add(dwg.polygon(points=points, **self.red_stroke_style))
+
+        # 2. Red Cutouts at X-Tabs
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if row % 2 != 0 and col % 2 != 0:
+                    self._draw_red_cutout(dwg, col * self.cell_size, row * self.cell_size, row, col)
+
+    def _draw_red_cutout(self, dwg, x, y, row, col):
+        is_tl_large = ((row - 1) // 2 + (col - 1) // 2) % 2 == 0
+        is_tr_large = ((row - 1) // 2 + (col + 1) // 2) % 2 == 0
+        is_bl_large = ((row + 1) // 2 + (col - 1) // 2) % 2 == 0
+        is_br_large = ((row + 1) // 2 + (col + 1) // 2) % 2 == 0
+
+        m_tl = self.get_margin(row - 1, col - 1)
+        m_tr = self.get_margin(row - 1, col + 1)
+        m_bl = self.get_margin(row + 1, col - 1)
+        m_br = self.get_margin(row + 1, col + 1)
+
+        # Top line points
+        P_T1 = (x, y - m_tl) if is_tl_large else (x + m_tl, y - m_tl)
+        P_T2 = (x + self.cell_size - m_tr, y - m_tr) if is_tl_large else (x + self.cell_size, y - m_tr)
+        
+        # Bottom line points
+        P_B1 = (x, y + self.cell_size + m_bl) if is_bl_large else (x + m_bl, y + self.cell_size + m_bl)
+        P_B2 = (x + self.cell_size - m_br, y + self.cell_size + m_br) if is_bl_large else (x + self.cell_size, y + self.cell_size + m_br)
+        
+        # Left line points
+        P_L1 = (x - m_tl, y) if is_tl_large else (x - m_tl, y + m_tl)
+        P_L2 = (x - m_bl, y + self.cell_size - m_bl) if is_tl_large else (x - m_bl, y + self.cell_size)
+        
+        # Right line points
+        P_R1 = (x + self.cell_size + m_tr, y) if is_tr_large else (x + self.cell_size + m_tr, y + m_tr)
+        P_R2 = (x + self.cell_size + m_br, y + self.cell_size - m_br) if is_tr_large else (x + self.cell_size + m_br, y + self.cell_size)
+
+        v_tl = self._line_intersection(P_T1, P_T2, P_L1, P_L2)
+        v_tr = self._line_intersection(P_T1, P_T2, P_R1, P_R2)
+        v_bl = self._line_intersection(P_B1, P_B2, P_L1, P_L2)
+        v_br = self._line_intersection(P_B1, P_B2, P_R1, P_R2)
+
+        dwg.add(dwg.polygon(points=[v_tl, v_tr, v_br, v_bl], **self.red_stroke_style))
+
 
 def get_next_array_number(folder="SVGs"):
     if not os.path.exists(folder):
@@ -346,7 +468,7 @@ def get_next_array_number(folder="SVGs"):
         return 1
 
     max_number = 0
-    pattern = r"Array_(\d+)"
+    pattern = r"Array_(\d+)_2_layer"
 
     for filename in os.listdir(folder):
         match = re.search(pattern, filename)
@@ -357,25 +479,25 @@ def get_next_array_number(folder="SVGs"):
     return max_number + 1
 
 def main():
-    GRID_COLS = 15
-    GRID_ROWS = 11
+    GRID_COLS = 7
+    GRID_ROWS = 9
     CELL_SIZE = 15.0
     
     # Margin settings
-    MIN_MARGIN = 1.5
+    MIN_MARGIN = 0.5
     MAX_MARGIN = 1.5
     
     # Tab width scales with margin so it doesn't intersect
-    MIN_TAB_WIDTH = 2.0
+    MIN_TAB_WIDTH = 1.0
     MAX_TAB_WIDTH = 2.0  
     
     # Gap size for the micro-joints (in mm)
     BRIDGE_SIZE = 0.5     
 
     next_number = get_next_array_number()
-    output_filename = f"SVGs/Array_{next_number}_variable_tabs.svg"
+    output_filename = f"SVGs/Array_{next_number}_2_layer.svg"
 
-    print(f"Generating {output_filename} with advanced bridge placement...")
+    print(f"Generating {output_filename} with dual layer support...")
 
     tabbed_grid = VariableTabbedGrid(
         output_filename, 
