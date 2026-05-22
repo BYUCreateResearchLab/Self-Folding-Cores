@@ -1,0 +1,3214 @@
+(LightBurn Core 2.0.05)
+(Custom GCode device profile, absolute coords)
+(Bounds: X3 Y3 to X232 Y212.5)
+
+(USER START SCRIPT)
+G4 P5000 (wait to walk to window)
+
+(USER START SCRIPT)
+G00 G17 G40 G21(Restore metric mode)
+G54
+G90(Restore absolute mode)
+(Cut @ 300 mm/min, 100% power
+)
+(air on)
+M11 (tool off)
+G0 X16.5 Y4.5 
+(Layer Cut Test 01)
+M3 (tool on)
+M3 (tool on)
+G1 X19.5F300  M10 Q255 (fire on)
+M11 (tool off)
+G0 X33  
+M3 (tool on)
+G1 X19.5  M10 Q255 (fire on)
+G1 Y16.5  M10 Q255 (fire on)
+G1 X33  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X25.5Y24  M10 Q255 (fire on)
+G1 X16.5Y15  M10 Q255 (fire on)
+M11 (tool off)
+G0 X15 Y16.5 
+M3 (tool on)
+G1 X24Y25.5  M10 Q255 (fire on)
+G1 X16.5Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+G1 X4.5  M10 Q255 (fire on)
+G1 Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0 X18 Y34.5 
+M3 (tool on)
+G1 X25.5Y27  M10 Q255 (fire on)
+G1 X34.5Y36  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y34.5 
+M3 (tool on)
+G1 Y34.788  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y35.288 
+M3 (tool on)
+G1 Y45.616  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y46.116 
+M3 (tool on)
+G1 Y46.5  M10 Q255 (fire on)
+G1 X46.5  M10 Q255 (fire on)
+G1 Y46.191  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y45.691 
+M3 (tool on)
+G1 Y34.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X46.25 Y34.5 
+M3 (tool on)
+G1 X34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X36  
+M3 (tool on)
+G1 X27Y25.5  M10 Q255 (fire on)
+G1 X34.5Y18  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y31.5  M10 Q255 (fire on)
+G1 X46.5  M10 Q255 (fire on)
+G1 Y18  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X54Y25.5  M10 Q255 (fire on)
+G1 X45Y34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X46.5 Y36 
+M3 (tool on)
+G1 X55.5Y27  M10 Q255 (fire on)
+G1 X63Y34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X49.5  M10 Q255 (fire on)
+G1 Y46.5  M10 Q255 (fire on)
+G1 X63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X55.5Y54  M10 Q255 (fire on)
+G1 X46.5Y45  M10 Q255 (fire on)
+M11 (tool off)
+G0 X45 Y46.5 
+M3 (tool on)
+G1 X54Y55.5  M10 Q255 (fire on)
+G1 X46.5Y63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y49.5  M10 Q255 (fire on)
+G1 X34.5  M10 Q255 (fire on)
+G1 Y63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X27Y55.5  M10 Q255 (fire on)
+G1 X36Y46.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X34.5 Y45 
+M3 (tool on)
+G1 X25.5Y54  M10 Q255 (fire on)
+G1 X18Y46.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X31.5  M10 Q255 (fire on)
+G1 Y34.5  M10 Q255 (fire on)
+G1 X18  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.5 Y48 
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+G1 X4.5  M10 Q255 (fire on)
+G1 Y54.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y54.25 
+M3 (tool on)
+G1 Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0 X3  
+M3 (tool on)
+G1 Y33  M10 Q255 (fire on)
+G1 X10.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X10.559  
+M3 (tool on)
+G1 X18  M10 Q255 (fire on)
+G1 Y33.471  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y33.971 
+M3 (tool on)
+G1 Y40.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y40.75 
+M3 (tool on)
+G1 Y47.035  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y47.535 
+M3 (tool on)
+G1 Y48  M10 Q255 (fire on)
+G1 X10.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X10.25  
+M3 (tool on)
+G1 X3  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.5  
+M3 (tool on)
+G1 X24Y55.5  M10 Q255 (fire on)
+G1 X15Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.5 Y66 
+M3 (tool on)
+G1 X25.5Y57  M10 Q255 (fire on)
+G1 X33Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X19.5  M10 Q255 (fire on)
+G1 Y76.5  M10 Q255 (fire on)
+G1 X33  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X25.5Y84  M10 Q255 (fire on)
+G1 X16.5Y75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X15 Y76.5 
+M3 (tool on)
+G1 X24Y85.5  M10 Q255 (fire on)
+G1 X16.5Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+G1 X4.5  M10 Q255 (fire on)
+G1 Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0 X18 Y94.5 
+M3 (tool on)
+G1 X31.5  M10 Q255 (fire on)
+G1 Y106.5  M10 Q255 (fire on)
+G1 X18  M10 Q255 (fire on)
+M11 (tool off)
+G0 X19.5 Y109 
+M3 (tool on)
+G1 X16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X3 Y107.75 
+M3 (tool on)
+G1 Y93  M10 Q255 (fire on)
+G1 X10.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X10.559  
+M3 (tool on)
+G1 X18  M10 Q255 (fire on)
+G1 Y93.471  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y93.971 
+M3 (tool on)
+G1 Y100.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y100.75 
+M3 (tool on)
+G1 Y108  M10 Q255 (fire on)
+G1 X3.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X4.5 Y121 
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y121 
+M3 (tool on)
+G1 Y109.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X4.75 Y109 
+M3 (tool on)
+G1 X16.5  M10 Q255 (fire on)
+G1 Y120.287  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y120.787 
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+G1 X15.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X15.31  
+M3 (tool on)
+G1 X4.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X15  
+M3 (tool on)
+G1 X24Y130  M10 Q255 (fire on)
+G1 X16.5Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+G1 X4.5  M10 Q255 (fire on)
+G1 Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X18 Y139 
+M3 (tool on)
+G1 X31.5  M10 Q255 (fire on)
+G1 Y151  M10 Q255 (fire on)
+G1 X18  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X25.5Y158.5  M10 Q255 (fire on)
+G1 X34.5Y149.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X36 Y151 
+M3 (tool on)
+G1 X27Y160  M10 Q255 (fire on)
+G1 X34.5Y167.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y154  M10 Q255 (fire on)
+G1 X46.5  M10 Q255 (fire on)
+G1 Y167.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X54Y160  M10 Q255 (fire on)
+G1 X45Y151  M10 Q255 (fire on)
+M11 (tool off)
+G0 X46.5 Y149.5 
+M3 (tool on)
+G1 X55.5Y158.5  M10 Q255 (fire on)
+G1 X63Y151  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X49.5  M10 Q255 (fire on)
+G1 Y139  M10 Q255 (fire on)
+G1 X63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X55.5Y131.5  M10 Q255 (fire on)
+G1 X46.5Y140.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X45 Y139 
+M3 (tool on)
+G1 X54Y130  M10 Q255 (fire on)
+G1 X46.5Y122.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y136  M10 Q255 (fire on)
+G1 X34.5  M10 Q255 (fire on)
+G1 Y122.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X27Y130  M10 Q255 (fire on)
+G1 X36Y139  M10 Q255 (fire on)
+M11 (tool off)
+G0 X34.5  
+M3 (tool on)
+G1 Y139.288  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y139.788 
+M3 (tool on)
+G1 Y150.116  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y150.616 
+M3 (tool on)
+G1 Y151  M10 Q255 (fire on)
+G1 X46.5  M10 Q255 (fire on)
+G1 Y150.691  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y150.191 
+M3 (tool on)
+G1 Y139.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X46.25 Y139 
+M3 (tool on)
+G1 X34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y140.5 
+M3 (tool on)
+G1 X25.5Y131.5  M10 Q255 (fire on)
+G1 X18Y139  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.5 Y152.5 
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+G1 X4.5  M10 Q255 (fire on)
+G1 Y159.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y158.75 
+M3 (tool on)
+G1 Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X3  
+M3 (tool on)
+G1 Y137.5  M10 Q255 (fire on)
+G1 X10.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X10.559  
+M3 (tool on)
+G1 X18  M10 Q255 (fire on)
+G1 Y137.971  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y138.471 
+M3 (tool on)
+G1 Y144.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y145.25 
+M3 (tool on)
+G1 Y151.535  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y152.035 
+M3 (tool on)
+G1 Y152.5  M10 Q255 (fire on)
+G1 X10.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X10.25  
+M3 (tool on)
+G1 X3  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.5  
+M3 (tool on)
+G1 X24Y160  M10 Q255 (fire on)
+G1 X15Y169  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.5 Y170.5 
+M3 (tool on)
+G1 X25.5Y161.5  M10 Q255 (fire on)
+G1 X33Y169  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X19.5  M10 Q255 (fire on)
+G1 Y181  M10 Q255 (fire on)
+G1 X33  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X25.5Y188.5  M10 Q255 (fire on)
+G1 X16.5Y179.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X15 Y181 
+M3 (tool on)
+G1 X24Y190  M10 Q255 (fire on)
+G1 X16.5Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y184  M10 Q255 (fire on)
+G1 X4.5  M10 Q255 (fire on)
+G1 Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X18 Y199 
+M3 (tool on)
+G1 X31.5  M10 Q255 (fire on)
+G1 Y211  M10 Q255 (fire on)
+G1 X18  M10 Q255 (fire on)
+M11 (tool off)
+G0 X31.5  
+M3 (tool on)
+G1 X34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X46.5  
+M3 (tool on)
+G1 X49.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X63  
+M3 (tool on)
+G1 X49.5  M10 Q255 (fire on)
+G1 Y199  M10 Q255 (fire on)
+G1 X63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X55.5Y191.5  M10 Q255 (fire on)
+G1 X46.5Y200.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X45 Y199 
+M3 (tool on)
+G1 X54Y190  M10 Q255 (fire on)
+G1 X46.5Y182.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y196  M10 Q255 (fire on)
+G1 X34.5  M10 Q255 (fire on)
+G1 Y182.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X27Y190  M10 Q255 (fire on)
+G1 X36Y199  M10 Q255 (fire on)
+M11 (tool off)
+G0 X34.5  
+M3 (tool on)
+G1 Y199.288  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y199.788 
+M3 (tool on)
+G1 Y211  M10 Q255 (fire on)
+G1 X46.5  M10 Q255 (fire on)
+G1 Y199  M10 Q255 (fire on)
+G1 X45.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X45.31  
+M3 (tool on)
+G1 X34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y200.5 
+M3 (tool on)
+G1 X25.5Y191.5  M10 Q255 (fire on)
+G1 X18Y199  M10 Q255 (fire on)
+M11 (tool off)
+G0 X3 Y212.25 
+M3 (tool on)
+G1 Y197.5  M10 Q255 (fire on)
+G1 X10.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X10.559  
+M3 (tool on)
+G1 X18  M10 Q255 (fire on)
+G1 Y197.971  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y198.471 
+M3 (tool on)
+G1 Y204.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y205.25 
+M3 (tool on)
+G1 Y212.5  M10 Q255 (fire on)
+G1 X3.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X4.5 Y184 
+M3 (tool on)
+G1 Y181  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y169  M10 Q255 (fire on)
+G1 X16.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.5 Y169.25 
+M3 (tool on)
+G1 Y180.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.25 Y181 
+M3 (tool on)
+G1 X4.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y169 
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+M11 (tool off)
+G0 X33 Y167.5 
+M3 (tool on)
+G1 Y167.816  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y168.316 
+M3 (tool on)
+G1 Y174.318  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y174.818 
+M3 (tool on)
+G1 Y181.641  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y182.141 
+M3 (tool on)
+G1 Y182.5  M10 Q255 (fire on)
+G1 X40.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X40.559  
+M3 (tool on)
+G1 X48  M10 Q255 (fire on)
+G1 Y182.029  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y181.529 
+M3 (tool on)
+G1 Y175.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y174.75 
+M3 (tool on)
+G1 Y168.465  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y167.965 
+M3 (tool on)
+G1 Y167.5  M10 Q255 (fire on)
+G1 X40.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X40.25  
+M3 (tool on)
+G1 X33  M10 Q255 (fire on)
+M11 (tool off)
+G0 X48 Y169 
+M3 (tool on)
+G1 X61.5  M10 Q255 (fire on)
+G1 Y181  M10 Q255 (fire on)
+G1 X48  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X55.5Y188.5  M10 Q255 (fire on)
+G1 X64.5Y179.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y181 
+M3 (tool on)
+G1 Y180.712  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y180.212 
+M3 (tool on)
+G1 Y169.884  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y169.384 
+M3 (tool on)
+G1 Y169  M10 Q255 (fire on)
+G1 X76.5  M10 Q255 (fire on)
+G1 Y181  M10 Q255 (fire on)
+G1 X64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X66  
+M3 (tool on)
+G1 X57Y190  M10 Q255 (fire on)
+G1 X64.5Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y184  M10 Q255 (fire on)
+G1 X76.5  M10 Q255 (fire on)
+G1 Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.5  
+M3 (tool on)
+G1 Y184  M10 Q255 (fire on)
+G1 X93.5  M10 Q255 (fire on)
+G1 Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X101Y190  M10 Q255 (fire on)
+G1 X92Y181  M10 Q255 (fire on)
+M11 (tool off)
+G0 X93.5 Y179.5 
+M3 (tool on)
+G1 X102.5Y188.5  M10 Q255 (fire on)
+G1 X110Y181  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X96.5  M10 Q255 (fire on)
+G1 Y169  M10 Q255 (fire on)
+G1 X110  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X102.5Y161.5  M10 Q255 (fire on)
+G1 X93.5Y170.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X92 Y169 
+M3 (tool on)
+G1 X101Y160  M10 Q255 (fire on)
+G1 X93.5Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+G1 X81.5  M10 Q255 (fire on)
+G1 Y159.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y158.75 
+M3 (tool on)
+G1 Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X80  
+M3 (tool on)
+G1 Y137.5  M10 Q255 (fire on)
+G1 X87.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X87.559  
+M3 (tool on)
+G1 X95  M10 Q255 (fire on)
+G1 Y137.971  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y138.471 
+M3 (tool on)
+G1 Y144.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y145.25 
+M3 (tool on)
+G1 Y151.535  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y152.035 
+M3 (tool on)
+G1 Y152.5  M10 Q255 (fire on)
+G1 X87.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X87.25  
+M3 (tool on)
+G1 X80  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5  
+M3 (tool on)
+G1 Y160.513  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y161.013 
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+G1 X64.5  M10 Q255 (fire on)
+G1 Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X57Y160  M10 Q255 (fire on)
+G1 X66Y169  M10 Q255 (fire on)
+M11 (tool off)
+G0 X64.5 Y170.5 
+M3 (tool on)
+G1 X55.5Y161.5  M10 Q255 (fire on)
+G1 X48Y169  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5  
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.5  
+M3 (tool on)
+G1 Y169  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y181 
+M3 (tool on)
+G1 Y169  M10 Q255 (fire on)
+G1 X93.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X93.5 Y169.25 
+M3 (tool on)
+G1 Y180.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X93.25 Y181 
+M3 (tool on)
+G1 X81.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y184  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5  
+M3 (tool on)
+G1 Y181  M10 Q255 (fire on)
+M11 (tool off)
+G0 X95 Y199 
+M3 (tool on)
+G1 X108.5  M10 Q255 (fire on)
+G1 Y211  M10 Q255 (fire on)
+G1 X95  M10 Q255 (fire on)
+M11 (tool off)
+G0 X108.5  
+M3 (tool on)
+G1 X111.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X123.5  
+M3 (tool on)
+G1 X126.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X140  
+M3 (tool on)
+G1 X126.5  M10 Q255 (fire on)
+G1 Y199  M10 Q255 (fire on)
+G1 X140  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X132.5Y191.5  M10 Q255 (fire on)
+G1 X123.5Y200.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X122 Y199 
+M3 (tool on)
+G1 X131Y190  M10 Q255 (fire on)
+G1 X123.5Y182.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y196  M10 Q255 (fire on)
+G1 X111.5  M10 Q255 (fire on)
+G1 Y182.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X104Y190  M10 Q255 (fire on)
+G1 X113Y199  M10 Q255 (fire on)
+M11 (tool off)
+G0 X111.5  
+M3 (tool on)
+G1 Y199.288  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y199.788 
+M3 (tool on)
+G1 Y211  M10 Q255 (fire on)
+G1 X123.5  M10 Q255 (fire on)
+G1 Y199  M10 Q255 (fire on)
+G1 X122.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X122.31  
+M3 (tool on)
+G1 X111.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y200.5 
+M3 (tool on)
+G1 X102.5Y191.5  M10 Q255 (fire on)
+G1 X95Y199  M10 Q255 (fire on)
+M11 (tool off)
+G0 X80 Y212.25 
+M3 (tool on)
+G1 Y197.5  M10 Q255 (fire on)
+G1 X87.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X87.559  
+M3 (tool on)
+G1 X95  M10 Q255 (fire on)
+G1 Y197.971  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y198.471 
+M3 (tool on)
+G1 Y204.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y205.25 
+M3 (tool on)
+G1 Y212.5  M10 Q255 (fire on)
+G1 X80.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X63  
+M3 (tool on)
+G1 Y205.682  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y205.182 
+M3 (tool on)
+G1 Y198.359  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y197.859 
+M3 (tool on)
+G1 Y197.5  M10 Q255 (fire on)
+G1 X70.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X70.559  
+M3 (tool on)
+G1 X78  M10 Q255 (fire on)
+G1 Y212.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X77.75 Y212.5 
+M3 (tool on)
+G1 X63  M10 Q255 (fire on)
+M11 (tool off)
+G0 X140  
+M3 (tool on)
+G1 Y205.682  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y205.182 
+M3 (tool on)
+G1 Y198.359  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y197.859 
+M3 (tool on)
+G1 Y197.5  M10 Q255 (fire on)
+G1 X147.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X147.559  
+M3 (tool on)
+G1 X155  M10 Q255 (fire on)
+G1 Y212.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X154.75 Y212.5 
+M3 (tool on)
+G1 X140  M10 Q255 (fire on)
+M11 (tool off)
+G0 X157 Y212.25 
+M3 (tool on)
+G1 Y197.5  M10 Q255 (fire on)
+G1 X164.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X164.559  
+M3 (tool on)
+G1 X172  M10 Q255 (fire on)
+G1 Y197.971  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y198.471 
+M3 (tool on)
+G1 Y204.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y205.25 
+M3 (tool on)
+G1 Y212.5  M10 Q255 (fire on)
+G1 X157.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X172 Y211 
+M3 (tool on)
+G1 X185.5  M10 Q255 (fire on)
+G1 Y199  M10 Q255 (fire on)
+G1 X172  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X179.5Y191.5  M10 Q255 (fire on)
+G1 X188.5Y200.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y199 
+M3 (tool on)
+G1 Y199.288  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y199.788 
+M3 (tool on)
+G1 Y211  M10 Q255 (fire on)
+G1 X200.5  M10 Q255 (fire on)
+G1 Y199  M10 Q255 (fire on)
+G1 X199.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X199.31  
+M3 (tool on)
+G1 X188.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X190  
+M3 (tool on)
+G1 X181Y190  M10 Q255 (fire on)
+G1 X188.5Y182.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y196  M10 Q255 (fire on)
+G1 X200.5  M10 Q255 (fire on)
+G1 Y182.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X208Y190  M10 Q255 (fire on)
+G1 X199Y199  M10 Q255 (fire on)
+M11 (tool off)
+G0 X200.5 Y200.5 
+M3 (tool on)
+G1 X209.5Y191.5  M10 Q255 (fire on)
+G1 X217Y199  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X203.5  M10 Q255 (fire on)
+G1 Y211  M10 Q255 (fire on)
+G1 X217  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y212.5 
+M3 (tool on)
+G1 Y205.682  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y205.182 
+M3 (tool on)
+G1 Y198.359  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y197.859 
+M3 (tool on)
+G1 Y197.5  M10 Q255 (fire on)
+G1 X224.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X224.559  
+M3 (tool on)
+G1 X232  M10 Q255 (fire on)
+G1 Y212.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X231.75 Y212.5 
+M3 (tool on)
+G1 X217  M10 Q255 (fire on)
+M11 (tool off)
+G0 X203.5 Y211 
+M3 (tool on)
+G1 X200.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X188.5  
+M3 (tool on)
+G1 X185.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.5 Y197.5 
+M3 (tool on)
+G1 X178Y190  M10 Q255 (fire on)
+G1 X169Y181  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.5 Y179.5 
+M3 (tool on)
+G1 X179.5Y188.5  M10 Q255 (fire on)
+G1 X187Y181  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X173.5  M10 Q255 (fire on)
+G1 Y169  M10 Q255 (fire on)
+G1 X187  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X179.5Y161.5  M10 Q255 (fire on)
+G1 X170.5Y170.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X169 Y169 
+M3 (tool on)
+G1 X178Y160  M10 Q255 (fire on)
+G1 X170.5Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+G1 X158.5  M10 Q255 (fire on)
+G1 Y159.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y158.75 
+M3 (tool on)
+G1 Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X157  
+M3 (tool on)
+G1 Y137.5  M10 Q255 (fire on)
+G1 X164.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X164.559  
+M3 (tool on)
+G1 X172  M10 Q255 (fire on)
+G1 Y137.971  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y138.471 
+M3 (tool on)
+G1 Y144.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y145.25 
+M3 (tool on)
+G1 Y151.535  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y152.035 
+M3 (tool on)
+G1 Y152.5  M10 Q255 (fire on)
+G1 X164.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X164.25  
+M3 (tool on)
+G1 X157  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5  
+M3 (tool on)
+G1 Y160.513  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y161.013 
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+G1 X141.5  M10 Q255 (fire on)
+G1 Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X134Y160  M10 Q255 (fire on)
+G1 X143Y169  M10 Q255 (fire on)
+M11 (tool off)
+G0 X141.5 Y170.5 
+M3 (tool on)
+G1 X132.5Y161.5  M10 Q255 (fire on)
+G1 X125Y169  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X138.5  M10 Q255 (fire on)
+G1 Y181  M10 Q255 (fire on)
+G1 X125  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X132.5Y188.5  M10 Q255 (fire on)
+G1 X141.5Y179.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y181 
+M3 (tool on)
+G1 Y180.712  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y180.212 
+M3 (tool on)
+G1 Y169.884  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y169.384 
+M3 (tool on)
+G1 Y169  M10 Q255 (fire on)
+G1 X153.5  M10 Q255 (fire on)
+G1 Y181  M10 Q255 (fire on)
+G1 X141.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X143  
+M3 (tool on)
+G1 X134Y190  M10 Q255 (fire on)
+G1 X141.5Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y184  M10 Q255 (fire on)
+G1 X153.5  M10 Q255 (fire on)
+G1 Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5  
+M3 (tool on)
+G1 Y184  M10 Q255 (fire on)
+G1 X170.5  M10 Q255 (fire on)
+G1 Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5 Y184 
+M3 (tool on)
+G1 Y181  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y169  M10 Q255 (fire on)
+G1 X170.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.5 Y169.25 
+M3 (tool on)
+G1 Y180.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.25 Y181 
+M3 (tool on)
+G1 X158.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5  
+M3 (tool on)
+G1 Y184  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y169 
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5  
+M3 (tool on)
+G1 Y169  M10 Q255 (fire on)
+M11 (tool off)
+G0 X187 Y167.5 
+M3 (tool on)
+G1 Y167.816  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y168.316 
+M3 (tool on)
+G1 Y174.318  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y174.818 
+M3 (tool on)
+G1 Y181.641  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y182.141 
+M3 (tool on)
+G1 Y182.5  M10 Q255 (fire on)
+G1 X194.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X194.559  
+M3 (tool on)
+G1 X202  M10 Q255 (fire on)
+G1 Y182.029  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y181.529 
+M3 (tool on)
+G1 Y175.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y174.75 
+M3 (tool on)
+G1 Y168.465  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y167.965 
+M3 (tool on)
+G1 Y167.5  M10 Q255 (fire on)
+G1 X194.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X194.25  
+M3 (tool on)
+G1 X187  M10 Q255 (fire on)
+M11 (tool off)
+G0 X188.5  
+M3 (tool on)
+G1 X181Y160  M10 Q255 (fire on)
+G1 X190Y151  M10 Q255 (fire on)
+M11 (tool off)
+G0 X188.5 Y149.5 
+M3 (tool on)
+G1 X179.5Y158.5  M10 Q255 (fire on)
+G1 X172Y151  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X185.5  M10 Q255 (fire on)
+G1 Y139  M10 Q255 (fire on)
+G1 X172  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X179.5Y131.5  M10 Q255 (fire on)
+G1 X188.5Y140.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y139 
+M3 (tool on)
+G1 Y139.288  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y139.788 
+M3 (tool on)
+G1 Y150.116  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y150.616 
+M3 (tool on)
+G1 Y151  M10 Q255 (fire on)
+G1 X200.5  M10 Q255 (fire on)
+G1 Y150.691  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y150.191 
+M3 (tool on)
+G1 Y139.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X200.25 Y139 
+M3 (tool on)
+G1 X188.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X190  
+M3 (tool on)
+G1 X181Y130  M10 Q255 (fire on)
+G1 X188.5Y122.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y136  M10 Q255 (fire on)
+G1 X200.5  M10 Q255 (fire on)
+G1 Y122.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X208Y130  M10 Q255 (fire on)
+G1 X199Y139  M10 Q255 (fire on)
+M11 (tool off)
+G0 X200.5 Y140.5 
+M3 (tool on)
+G1 X209.5Y131.5  M10 Q255 (fire on)
+G1 X217Y139  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X203.5  M10 Q255 (fire on)
+G1 Y151  M10 Q255 (fire on)
+G1 X217  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X209.5Y158.5  M10 Q255 (fire on)
+G1 X200.5Y149.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X199 Y151 
+M3 (tool on)
+G1 X208Y160  M10 Q255 (fire on)
+G1 X200.5Y167.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y154  M10 Q255 (fire on)
+G1 X188.5  M10 Q255 (fire on)
+G1 Y167.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X202 Y169 
+M3 (tool on)
+G1 X215.5  M10 Q255 (fire on)
+G1 Y181  M10 Q255 (fire on)
+G1 X202  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X209.5Y188.5  M10 Q255 (fire on)
+G1 X218.5Y179.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y181 
+M3 (tool on)
+G1 Y180.712  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y180.212 
+M3 (tool on)
+G1 Y169.884  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y169.384 
+M3 (tool on)
+G1 Y169  M10 Q255 (fire on)
+G1 X230.5  M10 Q255 (fire on)
+G1 Y181  M10 Q255 (fire on)
+G1 X218.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X220  
+M3 (tool on)
+G1 X211Y190  M10 Q255 (fire on)
+G1 X218.5Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y184  M10 Q255 (fire on)
+G1 X230.5  M10 Q255 (fire on)
+G1 Y197.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y184 
+M3 (tool on)
+G1 Y181  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y169 
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+M11 (tool off)
+G0 X220 Y169 
+M3 (tool on)
+G1 X211Y160  M10 Q255 (fire on)
+G1 X218.5Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y166  M10 Q255 (fire on)
+G1 X230.5  M10 Q255 (fire on)
+G1 Y161.013  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y160.513 
+M3 (tool on)
+G1 Y152.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X217  
+M3 (tool on)
+G1 Y152.184  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y151.684 
+M3 (tool on)
+G1 Y145.682  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y145.182 
+M3 (tool on)
+G1 Y138.359  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y137.859 
+M3 (tool on)
+G1 Y137.5  M10 Q255 (fire on)
+G1 X224.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X224.559  
+M3 (tool on)
+G1 X232  M10 Q255 (fire on)
+G1 Y152.5  M10 Q255 (fire on)
+G1 X224.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X224.25  
+M3 (tool on)
+G1 X217  M10 Q255 (fire on)
+M11 (tool off)
+G0 X218.5 Y137.5 
+M3 (tool on)
+G1 X211Y130  M10 Q255 (fire on)
+G1 X220Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0 X218.5  
+M3 (tool on)
+G1 Y120.712  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y120.212 
+M3 (tool on)
+G1 Y109  M10 Q255 (fire on)
+G1 X230.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X230.5 Y109.25 
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+G1 X219.268  M10 Q255 (fire on)
+M11 (tool off)
+G0 X218.768  
+M3 (tool on)
+G1 X218.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y119.5 
+M3 (tool on)
+G1 X209.5Y128.5  M10 Q255 (fire on)
+G1 X202Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X215.5  M10 Q255 (fire on)
+G1 Y109  M10 Q255 (fire on)
+G1 X202  M10 Q255 (fire on)
+M11 (tool off)
+G0 X200.5 Y106.5 
+M3 (tool on)
+G1 X203.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X215.5 Y109 
+M3 (tool on)
+G1 X218.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X217 Y108 
+M3 (tool on)
+G1 Y101.182  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y100.682 
+M3 (tool on)
+G1 Y93.859  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y93.359 
+M3 (tool on)
+G1 Y93  M10 Q255 (fire on)
+G1 X224.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X224.559  
+M3 (tool on)
+G1 X232  M10 Q255 (fire on)
+G1 Y107.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X231.75 Y108 
+M3 (tool on)
+G1 X217  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y106.5 
+M3 (tool on)
+G1 X203.5  M10 Q255 (fire on)
+G1 Y94.5  M10 Q255 (fire on)
+G1 X217  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X209.5Y87  M10 Q255 (fire on)
+G1 X200.5Y96  M10 Q255 (fire on)
+M11 (tool off)
+G0 X199 Y94.5 
+M3 (tool on)
+G1 X208Y85.5  M10 Q255 (fire on)
+G1 X200.5Y78  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y91.5  M10 Q255 (fire on)
+G1 X188.5  M10 Q255 (fire on)
+G1 Y78  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X181Y85.5  M10 Q255 (fire on)
+G1 X190Y94.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X188.5  
+M3 (tool on)
+G1 Y94.788  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y95.288 
+M3 (tool on)
+G1 Y106.5  M10 Q255 (fire on)
+G1 X200.5  M10 Q255 (fire on)
+G1 Y94.5  M10 Q255 (fire on)
+G1 X199.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X199.31  
+M3 (tool on)
+G1 X188.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y96 
+M3 (tool on)
+G1 X179.5Y87  M10 Q255 (fire on)
+G1 X172Y94.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X185.5  M10 Q255 (fire on)
+G1 Y106.5  M10 Q255 (fire on)
+G1 X172  M10 Q255 (fire on)
+M11 (tool off)
+G0 X173.5 Y109 
+M3 (tool on)
+G1 X170.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X157 Y107.75 
+M3 (tool on)
+G1 Y93  M10 Q255 (fire on)
+G1 X164.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X164.559  
+M3 (tool on)
+G1 X172  M10 Q255 (fire on)
+G1 Y93.471  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y93.971 
+M3 (tool on)
+G1 Y100.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y100.75 
+M3 (tool on)
+G1 Y108  M10 Q255 (fire on)
+G1 X157.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X141.5 Y109 
+M3 (tool on)
+G1 X138.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X140 Y108 
+M3 (tool on)
+G1 Y101.182  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y100.682 
+M3 (tool on)
+G1 Y93.859  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y93.359 
+M3 (tool on)
+G1 Y93  M10 Q255 (fire on)
+G1 X147.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X147.559  
+M3 (tool on)
+G1 X155  M10 Q255 (fire on)
+G1 Y107.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X154.75 Y108 
+M3 (tool on)
+G1 X140  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y106.5 
+M3 (tool on)
+G1 X126.5  M10 Q255 (fire on)
+G1 Y94.5  M10 Q255 (fire on)
+G1 X140  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X132.5Y87  M10 Q255 (fire on)
+G1 X123.5Y96  M10 Q255 (fire on)
+M11 (tool off)
+G0 X122 Y94.5 
+M3 (tool on)
+G1 X131Y85.5  M10 Q255 (fire on)
+G1 X123.5Y78  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y91.5  M10 Q255 (fire on)
+G1 X111.5  M10 Q255 (fire on)
+G1 Y78  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X104Y85.5  M10 Q255 (fire on)
+G1 X113Y94.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X111.5  
+M3 (tool on)
+G1 Y94.788  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y95.288 
+M3 (tool on)
+G1 Y106.5  M10 Q255 (fire on)
+G1 X123.5  M10 Q255 (fire on)
+G1 Y94.5  M10 Q255 (fire on)
+G1 X122.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X122.31  
+M3 (tool on)
+G1 X111.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y96 
+M3 (tool on)
+G1 X102.5Y87  M10 Q255 (fire on)
+G1 X95Y94.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X108.5  M10 Q255 (fire on)
+G1 Y106.5  M10 Q255 (fire on)
+G1 X95  M10 Q255 (fire on)
+M11 (tool off)
+G0 X96.5 Y109 
+M3 (tool on)
+G1 X93.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X80 Y107.75 
+M3 (tool on)
+G1 Y93  M10 Q255 (fire on)
+G1 X87.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X87.559  
+M3 (tool on)
+G1 X95  M10 Q255 (fire on)
+G1 Y93.471  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y93.971 
+M3 (tool on)
+G1 Y100.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y100.75 
+M3 (tool on)
+G1 Y108  M10 Q255 (fire on)
+G1 X80.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X64.5 Y109 
+M3 (tool on)
+G1 X61.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X63 Y108 
+M3 (tool on)
+G1 Y101.182  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y100.682 
+M3 (tool on)
+G1 Y93.859  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y93.359 
+M3 (tool on)
+G1 Y93  M10 Q255 (fire on)
+G1 X70.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X70.559  
+M3 (tool on)
+G1 X78  M10 Q255 (fire on)
+G1 Y107.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X77.75 Y108 
+M3 (tool on)
+G1 X63  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y106.5 
+M3 (tool on)
+G1 X49.5  M10 Q255 (fire on)
+G1 Y94.5  M10 Q255 (fire on)
+G1 X63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X55.5Y87  M10 Q255 (fire on)
+G1 X46.5Y96  M10 Q255 (fire on)
+M11 (tool off)
+G0 X45 Y94.5 
+M3 (tool on)
+G1 X54Y85.5  M10 Q255 (fire on)
+G1 X46.5Y78  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y91.5  M10 Q255 (fire on)
+G1 X34.5  M10 Q255 (fire on)
+G1 Y78  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X27Y85.5  M10 Q255 (fire on)
+G1 X36Y94.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X34.5  
+M3 (tool on)
+G1 Y94.788  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y95.288 
+M3 (tool on)
+G1 Y106.5  M10 Q255 (fire on)
+G1 X46.5  M10 Q255 (fire on)
+G1 Y94.5  M10 Q255 (fire on)
+G1 X45.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X45.31  
+M3 (tool on)
+G1 X34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y96 
+M3 (tool on)
+G1 X25.5Y87  M10 Q255 (fire on)
+G1 X18Y94.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X31.5 Y106.5 
+M3 (tool on)
+G1 X34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X33 Y107.5 
+M3 (tool on)
+G1 Y114.318  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y114.818 
+M3 (tool on)
+G1 Y121.641  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y122.141 
+M3 (tool on)
+G1 Y122.5  M10 Q255 (fire on)
+G1 X40.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X40.559  
+M3 (tool on)
+G1 X48  M10 Q255 (fire on)
+G1 Y122.029  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y121.529 
+M3 (tool on)
+G1 Y115.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y114.75 
+M3 (tool on)
+G1 Y107.5  M10 Q255 (fire on)
+G1 X33  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y109 
+M3 (tool on)
+G1 X19.5  M10 Q255 (fire on)
+G1 Y121  M10 Q255 (fire on)
+G1 X33  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X25.5Y128.5  M10 Q255 (fire on)
+G1 X16.5Y119.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X48 Y121 
+M3 (tool on)
+G1 X61.5  M10 Q255 (fire on)
+G1 Y109  M10 Q255 (fire on)
+G1 X48  M10 Q255 (fire on)
+M11 (tool off)
+G0 X46.5 Y106.5 
+M3 (tool on)
+G1 X49.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X48 Y121 
+M3 (tool on)
+G1 X55.5Y128.5  M10 Q255 (fire on)
+G1 X64.5Y119.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y121 
+M3 (tool on)
+G1 Y120.712  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y120.212 
+M3 (tool on)
+G1 Y109  M10 Q255 (fire on)
+G1 X76.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5 Y109.25 
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+G1 X65.268  M10 Q255 (fire on)
+M11 (tool off)
+G0 X64.768  
+M3 (tool on)
+G1 X64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X66  
+M3 (tool on)
+G1 X57Y130  M10 Q255 (fire on)
+G1 X64.5Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+G1 X76.5  M10 Q255 (fire on)
+G1 Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.5  
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+G1 X93.5  M10 Q255 (fire on)
+G1 Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X101Y130  M10 Q255 (fire on)
+G1 X92Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0 X93.5 Y119.5 
+M3 (tool on)
+G1 X102.5Y128.5  M10 Q255 (fire on)
+G1 X110Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X96.5  M10 Q255 (fire on)
+G1 Y109  M10 Q255 (fire on)
+G1 X110  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y107.5 
+M3 (tool on)
+G1 Y114.318  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y114.818 
+M3 (tool on)
+G1 Y121.641  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y122.141 
+M3 (tool on)
+G1 Y122.5  M10 Q255 (fire on)
+G1 X117.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X117.559  
+M3 (tool on)
+G1 X125  M10 Q255 (fire on)
+G1 Y122.029  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y121.529 
+M3 (tool on)
+G1 Y115.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y114.75 
+M3 (tool on)
+G1 Y107.5  M10 Q255 (fire on)
+G1 X110  M10 Q255 (fire on)
+M11 (tool off)
+G0 X108.5 Y106.5 
+M3 (tool on)
+G1 X111.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X123.5  
+M3 (tool on)
+G1 X126.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X125 Y109 
+M3 (tool on)
+G1 X138.5  M10 Q255 (fire on)
+G1 Y121  M10 Q255 (fire on)
+G1 X125  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X132.5Y128.5  M10 Q255 (fire on)
+G1 X141.5Y119.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y121 
+M3 (tool on)
+G1 Y120.712  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y120.212 
+M3 (tool on)
+G1 Y109  M10 Q255 (fire on)
+G1 X153.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5 Y109.25 
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+G1 X142.268  M10 Q255 (fire on)
+M11 (tool off)
+G0 X141.768  
+M3 (tool on)
+G1 X141.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X143  
+M3 (tool on)
+G1 X134Y130  M10 Q255 (fire on)
+G1 X141.5Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+G1 X153.5  M10 Q255 (fire on)
+G1 Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5  
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+G1 X170.5  M10 Q255 (fire on)
+G1 Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X178Y130  M10 Q255 (fire on)
+G1 X169Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.5 Y119.5 
+M3 (tool on)
+G1 X179.5Y128.5  M10 Q255 (fire on)
+G1 X187Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X173.5  M10 Q255 (fire on)
+G1 Y109  M10 Q255 (fire on)
+G1 X187  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y107.5 
+M3 (tool on)
+G1 Y114.318  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y114.818 
+M3 (tool on)
+G1 Y121.641  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y122.141 
+M3 (tool on)
+G1 Y122.5  M10 Q255 (fire on)
+G1 X194.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X194.559  
+M3 (tool on)
+G1 X202  M10 Q255 (fire on)
+G1 Y122.029  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y121.529 
+M3 (tool on)
+G1 Y115.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y114.75 
+M3 (tool on)
+G1 Y107.5  M10 Q255 (fire on)
+G1 X187  M10 Q255 (fire on)
+M11 (tool off)
+G0 X185.5 Y106.5 
+M3 (tool on)
+G1 X188.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.5 Y93 
+M3 (tool on)
+G1 X178Y85.5  M10 Q255 (fire on)
+G1 X169Y76.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.5 Y75 
+M3 (tool on)
+G1 X179.5Y84  M10 Q255 (fire on)
+G1 X187Y76.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X173.5  M10 Q255 (fire on)
+G1 Y64.5  M10 Q255 (fire on)
+G1 X187  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X179.5Y57  M10 Q255 (fire on)
+G1 X170.5Y66  M10 Q255 (fire on)
+M11 (tool off)
+G0 X169 Y64.5 
+M3 (tool on)
+G1 X178Y55.5  M10 Q255 (fire on)
+G1 X170.5Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+G1 X158.5  M10 Q255 (fire on)
+G1 Y54.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y54.25 
+M3 (tool on)
+G1 Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0 X157  
+M3 (tool on)
+G1 Y33  M10 Q255 (fire on)
+G1 X164.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X164.559  
+M3 (tool on)
+G1 X172  M10 Q255 (fire on)
+G1 Y33.471  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y33.971 
+M3 (tool on)
+G1 Y40.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y40.75 
+M3 (tool on)
+G1 Y47.035  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y47.535 
+M3 (tool on)
+G1 Y48  M10 Q255 (fire on)
+G1 X164.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X164.25  
+M3 (tool on)
+G1 X157  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5  
+M3 (tool on)
+G1 Y56.013  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y56.513 
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+G1 X141.5  M10 Q255 (fire on)
+G1 Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X134Y55.5  M10 Q255 (fire on)
+G1 X143Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X141.5 Y66 
+M3 (tool on)
+G1 X132.5Y57  M10 Q255 (fire on)
+G1 X125Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X138.5  M10 Q255 (fire on)
+G1 Y76.5  M10 Q255 (fire on)
+G1 X125  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X132.5Y84  M10 Q255 (fire on)
+G1 X141.5Y75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y76.5 
+M3 (tool on)
+G1 Y76.212  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y75.712 
+M3 (tool on)
+G1 Y65.384  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y64.884 
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+G1 X153.5  M10 Q255 (fire on)
+G1 Y76.5  M10 Q255 (fire on)
+G1 X141.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X143  
+M3 (tool on)
+G1 X134Y85.5  M10 Q255 (fire on)
+G1 X141.5Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+G1 X153.5  M10 Q255 (fire on)
+G1 Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5  
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+G1 X170.5  M10 Q255 (fire on)
+G1 Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5 Y79.5 
+M3 (tool on)
+G1 Y76.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+G1 X170.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.5 Y64.75 
+M3 (tool on)
+G1 Y76.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X170.25 Y76.5 
+M3 (tool on)
+G1 X158.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5  
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y64.5 
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5  
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X187 Y63 
+M3 (tool on)
+G1 Y63.316  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y63.816 
+M3 (tool on)
+G1 Y69.818  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y70.318 
+M3 (tool on)
+G1 Y77.141  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y77.641 
+M3 (tool on)
+G1 Y78  M10 Q255 (fire on)
+G1 X194.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X194.559  
+M3 (tool on)
+G1 X202  M10 Q255 (fire on)
+G1 Y77.529  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y77.029 
+M3 (tool on)
+G1 Y70.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y70.25 
+M3 (tool on)
+G1 Y63.965  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y63.465 
+M3 (tool on)
+G1 Y63  M10 Q255 (fire on)
+G1 X194.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X194.25  
+M3 (tool on)
+G1 X187  M10 Q255 (fire on)
+M11 (tool off)
+G0 X188.5  
+M3 (tool on)
+G1 X181Y55.5  M10 Q255 (fire on)
+G1 X190Y46.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X188.5 Y45 
+M3 (tool on)
+G1 X179.5Y54  M10 Q255 (fire on)
+G1 X172Y46.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X185.5  M10 Q255 (fire on)
+G1 Y34.5  M10 Q255 (fire on)
+G1 X172  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X179.5Y27  M10 Q255 (fire on)
+G1 X188.5Y36  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y34.5 
+M3 (tool on)
+G1 Y34.788  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y35.288 
+M3 (tool on)
+G1 Y45.616  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y46.116 
+M3 (tool on)
+G1 Y46.5  M10 Q255 (fire on)
+G1 X200.5  M10 Q255 (fire on)
+G1 Y46.191  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y45.691 
+M3 (tool on)
+G1 Y34.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X200.25 Y34.5 
+M3 (tool on)
+G1 X188.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X190  
+M3 (tool on)
+G1 X181Y25.5  M10 Q255 (fire on)
+G1 X188.5Y18  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y31.5  M10 Q255 (fire on)
+G1 X200.5  M10 Q255 (fire on)
+G1 Y18  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X208Y25.5  M10 Q255 (fire on)
+G1 X199Y34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X200.5 Y36 
+M3 (tool on)
+G1 X209.5Y27  M10 Q255 (fire on)
+G1 X217Y34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X203.5  M10 Q255 (fire on)
+G1 Y46.5  M10 Q255 (fire on)
+G1 X217  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X209.5Y54  M10 Q255 (fire on)
+G1 X200.5Y45  M10 Q255 (fire on)
+M11 (tool off)
+G0 X199 Y46.5 
+M3 (tool on)
+G1 X208Y55.5  M10 Q255 (fire on)
+G1 X200.5Y63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y49.5  M10 Q255 (fire on)
+G1 X188.5  M10 Q255 (fire on)
+G1 Y63  M10 Q255 (fire on)
+M11 (tool off)
+G0 X202 Y64.5 
+M3 (tool on)
+G1 X215.5  M10 Q255 (fire on)
+G1 Y76.5  M10 Q255 (fire on)
+G1 X202  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X209.5Y84  M10 Q255 (fire on)
+G1 X218.5Y75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y76.5 
+M3 (tool on)
+G1 Y76.212  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y75.712 
+M3 (tool on)
+G1 Y65.384  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y64.884 
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+G1 X230.5  M10 Q255 (fire on)
+G1 Y76.5  M10 Q255 (fire on)
+G1 X218.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X220  
+M3 (tool on)
+G1 X211Y85.5  M10 Q255 (fire on)
+G1 X218.5Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+G1 X230.5  M10 Q255 (fire on)
+G1 Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y79.5 
+M3 (tool on)
+G1 Y76.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y64.5 
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X220 Y64.5 
+M3 (tool on)
+G1 X211Y55.5  M10 Q255 (fire on)
+G1 X218.5Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+G1 X230.5  M10 Q255 (fire on)
+G1 Y56.513  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y56.013 
+M3 (tool on)
+G1 Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0 X217  
+M3 (tool on)
+G1 Y47.684  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y47.184 
+M3 (tool on)
+G1 Y41.182  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y40.682 
+M3 (tool on)
+G1 Y33.859  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y33.359 
+M3 (tool on)
+G1 Y33  M10 Q255 (fire on)
+G1 X224.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X224.559  
+M3 (tool on)
+G1 X232  M10 Q255 (fire on)
+G1 Y48  M10 Q255 (fire on)
+G1 X224.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X224.25  
+M3 (tool on)
+G1 X217  M10 Q255 (fire on)
+M11 (tool off)
+G0 X218.5 Y33 
+M3 (tool on)
+G1 X211Y25.5  M10 Q255 (fire on)
+G1 X220Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X218.5  
+M3 (tool on)
+G1 Y16.212  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y15.712 
+M3 (tool on)
+G1 Y4.5  M10 Q255 (fire on)
+G1 X230.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X230.5 Y4.75 
+M3 (tool on)
+G1 Y16.5  M10 Q255 (fire on)
+G1 X219.268  M10 Q255 (fire on)
+M11 (tool off)
+G0 X218.768  
+M3 (tool on)
+G1 X218.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y15 
+M3 (tool on)
+G1 X209.5Y24  M10 Q255 (fire on)
+G1 X202Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X215.5  M10 Q255 (fire on)
+G1 Y4.5  M10 Q255 (fire on)
+G1 X202  M10 Q255 (fire on)
+M11 (tool off)
+G0 X215.5  
+M3 (tool on)
+G1 X218.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X230.5 Y16.5 
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y33 
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+G1 X218.5  M10 Q255 (fire on)
+G1 Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0 X187 Y16.5 
+M3 (tool on)
+G1 X173.5  M10 Q255 (fire on)
+G1 Y4.5  M10 Q255 (fire on)
+G1 X187  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y3 
+M3 (tool on)
+G1 Y9.818  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y10.318 
+M3 (tool on)
+G1 Y17.141  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y17.641 
+M3 (tool on)
+G1 Y18  M10 Q255 (fire on)
+G1 X194.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X194.559  
+M3 (tool on)
+G1 X202  M10 Q255 (fire on)
+G1 Y17.529  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y17.029 
+M3 (tool on)
+G1 Y10.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y10.25 
+M3 (tool on)
+G1 Y3  M10 Q255 (fire on)
+G1 X187  M10 Q255 (fire on)
+M11 (tool off)
+G0 X173.5 Y4.5 
+M3 (tool on)
+G1 X170.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y15 
+M3 (tool on)
+G1 X179.5Y24  M10 Q255 (fire on)
+G1 X187Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X169  
+M3 (tool on)
+G1 X178Y25.5  M10 Q255 (fire on)
+G1 X170.5Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+G1 X158.5  M10 Q255 (fire on)
+G1 Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5  
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+G1 X141.5  M10 Q255 (fire on)
+G1 Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X134Y25.5  M10 Q255 (fire on)
+G1 X143Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X141.5  
+M3 (tool on)
+G1 Y16.212  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y15.712 
+M3 (tool on)
+G1 Y4.5  M10 Q255 (fire on)
+G1 X153.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5 Y4.75 
+M3 (tool on)
+G1 Y16.5  M10 Q255 (fire on)
+G1 X142.268  M10 Q255 (fire on)
+M11 (tool off)
+G0 X141.768  
+M3 (tool on)
+G1 X141.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y15 
+M3 (tool on)
+G1 X132.5Y24  M10 Q255 (fire on)
+G1 X125Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X138.5  M10 Q255 (fire on)
+G1 Y4.5  M10 Q255 (fire on)
+G1 X125  M10 Q255 (fire on)
+M11 (tool off)
+G0 X138.5  
+M3 (tool on)
+G1 X141.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5 Y16.5 
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5  
+M3 (tool on)
+G1 Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y4.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.75 Y4.5 
+M3 (tool on)
+G1 X170.5  M10 Q255 (fire on)
+G1 Y15.787  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y16.287 
+M3 (tool on)
+G1 Y16.5  M10 Q255 (fire on)
+G1 X169.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X169.31  
+M3 (tool on)
+G1 X158.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X140 Y34.5 
+M3 (tool on)
+G1 X126.5  M10 Q255 (fire on)
+G1 Y46.5  M10 Q255 (fire on)
+G1 X140  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X132.5Y54  M10 Q255 (fire on)
+G1 X123.5Y45  M10 Q255 (fire on)
+M11 (tool off)
+G0 X122 Y46.5 
+M3 (tool on)
+G1 X131Y55.5  M10 Q255 (fire on)
+G1 X123.5Y63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y49.5  M10 Q255 (fire on)
+G1 X111.5  M10 Q255 (fire on)
+G1 Y63  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X104Y55.5  M10 Q255 (fire on)
+G1 X113Y46.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X111.5 Y45 
+M3 (tool on)
+G1 X102.5Y54  M10 Q255 (fire on)
+G1 X95Y46.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X108.5  M10 Q255 (fire on)
+G1 Y34.5  M10 Q255 (fire on)
+G1 X95  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X102.5Y27  M10 Q255 (fire on)
+G1 X111.5Y36  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y34.5 
+M3 (tool on)
+G1 Y34.788  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y35.288 
+M3 (tool on)
+G1 Y45.616  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y46.116 
+M3 (tool on)
+G1 Y46.5  M10 Q255 (fire on)
+G1 X123.5  M10 Q255 (fire on)
+G1 Y46.191  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y45.691 
+M3 (tool on)
+G1 Y34.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X123.25 Y34.5 
+M3 (tool on)
+G1 X111.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X113  
+M3 (tool on)
+G1 X104Y25.5  M10 Q255 (fire on)
+G1 X111.5Y18  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y31.5  M10 Q255 (fire on)
+G1 X123.5  M10 Q255 (fire on)
+G1 Y18  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X131Y25.5  M10 Q255 (fire on)
+G1 X122Y34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X123.5 Y36 
+M3 (tool on)
+G1 X132.5Y27  M10 Q255 (fire on)
+G1 X140Y34.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y48 
+M3 (tool on)
+G1 Y47.684  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y47.184 
+M3 (tool on)
+G1 Y41.182  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y40.682 
+M3 (tool on)
+G1 Y33.859  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y33.359 
+M3 (tool on)
+G1 Y33  M10 Q255 (fire on)
+G1 X147.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X147.559  
+M3 (tool on)
+G1 X155  M10 Q255 (fire on)
+G1 Y48  M10 Q255 (fire on)
+G1 X147.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X147.25  
+M3 (tool on)
+G1 X140  M10 Q255 (fire on)
+M11 (tool off)
+G0 X110 Y63 
+M3 (tool on)
+G1 Y63.316  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y63.816 
+M3 (tool on)
+G1 Y69.818  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y70.318 
+M3 (tool on)
+G1 Y77.141  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y77.641 
+M3 (tool on)
+G1 Y78  M10 Q255 (fire on)
+G1 X117.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X117.559  
+M3 (tool on)
+G1 X125  M10 Q255 (fire on)
+G1 Y77.529  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y77.029 
+M3 (tool on)
+G1 Y70.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y70.25 
+M3 (tool on)
+G1 Y63.965  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y63.465 
+M3 (tool on)
+G1 Y63  M10 Q255 (fire on)
+G1 X117.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X117.25  
+M3 (tool on)
+G1 X110  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y64.5 
+M3 (tool on)
+G1 X96.5  M10 Q255 (fire on)
+G1 Y76.5  M10 Q255 (fire on)
+G1 X110  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X102.5Y84  M10 Q255 (fire on)
+G1 X93.5Y75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X92 Y76.5 
+M3 (tool on)
+G1 X101Y85.5  M10 Q255 (fire on)
+G1 X93.5Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+G1 X81.5  M10 Q255 (fire on)
+G1 Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5  
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+G1 X64.5  M10 Q255 (fire on)
+G1 Y93  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X57Y85.5  M10 Q255 (fire on)
+G1 X66Y76.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X64.5  
+M3 (tool on)
+G1 Y76.212  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y75.712 
+M3 (tool on)
+G1 Y65.384  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y64.884 
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+G1 X76.5  M10 Q255 (fire on)
+G1 Y76.5  M10 Q255 (fire on)
+G1 X64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y75 
+M3 (tool on)
+G1 X55.5Y84  M10 Q255 (fire on)
+G1 X48Y76.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X61.5  M10 Q255 (fire on)
+G1 Y64.5  M10 Q255 (fire on)
+G1 X48  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X55.5Y57  M10 Q255 (fire on)
+G1 X64.5Y66  M10 Q255 (fire on)
+M11 (tool off)
+G0 X66 Y64.5 
+M3 (tool on)
+G1 X57Y55.5  M10 Q255 (fire on)
+G1 X64.5Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+G1 X76.5  M10 Q255 (fire on)
+G1 Y56.513  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y56.013 
+M3 (tool on)
+G1 Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0 X80  
+M3 (tool on)
+G1 Y33  M10 Q255 (fire on)
+G1 X87.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X87.559  
+M3 (tool on)
+G1 X95  M10 Q255 (fire on)
+G1 Y33.471  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y33.971 
+M3 (tool on)
+G1 Y40.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y40.75 
+M3 (tool on)
+G1 Y47.035  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y47.535 
+M3 (tool on)
+G1 Y48  M10 Q255 (fire on)
+G1 X87.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X87.25  
+M3 (tool on)
+G1 X80  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.5  
+M3 (tool on)
+G1 Y54.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y54.75 
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+G1 X93.5  M10 Q255 (fire on)
+G1 Y48  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X101Y55.5  M10 Q255 (fire on)
+G1 X92Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X93.5 Y66 
+M3 (tool on)
+G1 X102.5Y57  M10 Q255 (fire on)
+G1 X110Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.5  
+M3 (tool on)
+G1 Y61.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5  
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y76.5 
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.5  
+M3 (tool on)
+G1 Y76.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+G1 X93.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X93.5 Y64.75 
+M3 (tool on)
+G1 Y76.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X93.25 Y76.5 
+M3 (tool on)
+G1 X81.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X63 Y48 
+M3 (tool on)
+G1 Y47.684  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y47.184 
+M3 (tool on)
+G1 Y41.182  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y40.682 
+M3 (tool on)
+G1 Y33.859  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y33.359 
+M3 (tool on)
+G1 Y33  M10 Q255 (fire on)
+G1 X70.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X70.559  
+M3 (tool on)
+G1 X78  M10 Q255 (fire on)
+G1 Y48  M10 Q255 (fire on)
+G1 X70.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X70.25  
+M3 (tool on)
+G1 X63  M10 Q255 (fire on)
+M11 (tool off)
+G0 X64.5 Y33 
+M3 (tool on)
+G1 X57Y25.5  M10 Q255 (fire on)
+G1 X66Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X64.5  
+M3 (tool on)
+G1 Y16.212  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y15.712 
+M3 (tool on)
+G1 Y4.5  M10 Q255 (fire on)
+G1 X76.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5 Y4.75 
+M3 (tool on)
+G1 Y16.5  M10 Q255 (fire on)
+G1 X65.268  M10 Q255 (fire on)
+M11 (tool off)
+G0 X64.768  
+M3 (tool on)
+G1 X64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y15 
+M3 (tool on)
+G1 X55.5Y24  M10 Q255 (fire on)
+G1 X48Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X61.5  M10 Q255 (fire on)
+G1 Y4.5  M10 Q255 (fire on)
+G1 X48  M10 Q255 (fire on)
+M11 (tool off)
+G0 X61.5  
+M3 (tool on)
+G1 X64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5 Y16.5 
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.5  
+M3 (tool on)
+G1 Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y4.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.75 Y4.5 
+M3 (tool on)
+G1 X93.5  M10 Q255 (fire on)
+G1 Y15.787  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y16.287 
+M3 (tool on)
+G1 Y16.5  M10 Q255 (fire on)
+G1 X92.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X92.31  
+M3 (tool on)
+G1 X81.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X92  
+M3 (tool on)
+G1 X101Y25.5  M10 Q255 (fire on)
+G1 X93.5Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+G1 X81.5  M10 Q255 (fire on)
+G1 Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5  
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+G1 X64.5  M10 Q255 (fire on)
+G1 Y33  M10 Q255 (fire on)
+M11 (tool off)
+G0 X93.5 Y15 
+M3 (tool on)
+G1 X102.5Y24  M10 Q255 (fire on)
+G1 X110Y16.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X96.5  M10 Q255 (fire on)
+G1 Y4.5  M10 Q255 (fire on)
+G1 X110  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y3 
+M3 (tool on)
+G1 Y9.818  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y10.318 
+M3 (tool on)
+G1 Y17.141  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y17.641 
+M3 (tool on)
+G1 Y18  M10 Q255 (fire on)
+G1 X117.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X117.559  
+M3 (tool on)
+G1 X125  M10 Q255 (fire on)
+G1 Y17.529  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y17.029 
+M3 (tool on)
+G1 Y10.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y10.25 
+M3 (tool on)
+G1 Y3  M10 Q255 (fire on)
+G1 X110  M10 Q255 (fire on)
+M11 (tool off)
+G0 X96.5 Y4.5 
+M3 (tool on)
+G1 X93.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X33 Y3 
+M3 (tool on)
+G1 Y9.818  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y10.318 
+M3 (tool on)
+G1 Y17.141  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y17.641 
+M3 (tool on)
+G1 Y18  M10 Q255 (fire on)
+G1 X40.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X40.559  
+M3 (tool on)
+G1 X48  M10 Q255 (fire on)
+G1 Y17.529  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y17.029 
+M3 (tool on)
+G1 Y10.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y10.25 
+M3 (tool on)
+G1 Y3  M10 Q255 (fire on)
+G1 X33  M10 Q255 (fire on)
+M11 (tool off)
+G0 X4.5 Y16.5 
+M3 (tool on)
+G1 Y4.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X4.75 Y4.5 
+M3 (tool on)
+G1 X16.5  M10 Q255 (fire on)
+G1 Y15.787  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y16.287 
+M3 (tool on)
+G1 Y16.5  M10 Q255 (fire on)
+G1 X15.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X15.31  
+M3 (tool on)
+G1 X4.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y19.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y61.5 
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y76.5 
+M3 (tool on)
+G1 Y79.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y76.5 
+M3 (tool on)
+G1 Y64.5  M10 Q255 (fire on)
+G1 X16.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.5 Y64.75 
+M3 (tool on)
+G1 Y76.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X16.25 Y76.5 
+M3 (tool on)
+G1 X4.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X33 Y63 
+M3 (tool on)
+G1 Y63.316  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y63.816 
+M3 (tool on)
+G1 Y69.818  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y70.318 
+M3 (tool on)
+G1 Y77.141  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y77.641 
+M3 (tool on)
+G1 Y78  M10 Q255 (fire on)
+G1 X40.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X40.559  
+M3 (tool on)
+G1 X48  M10 Q255 (fire on)
+G1 Y77.529  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y77.029 
+M3 (tool on)
+G1 Y70.75  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y70.25 
+M3 (tool on)
+G1 Y63.965  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y63.465 
+M3 (tool on)
+G1 Y63  M10 Q255 (fire on)
+G1 X40.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X40.25  
+M3 (tool on)
+G1 X33  M10 Q255 (fire on)
+M11 (tool off)
+G0 X76.5 Y121 
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.5  
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y109.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X81.75 Y109 
+M3 (tool on)
+G1 X93.5  M10 Q255 (fire on)
+G1 Y120.287  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y120.787 
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+G1 X92.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X92.31  
+M3 (tool on)
+G1 X81.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X111.5 Y122.5 
+M3 (tool on)
+G1 Y136  M10 Q255 (fire on)
+G1 X123.5  M10 Q255 (fire on)
+G1 Y122.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X131Y130  M10 Q255 (fire on)
+G1 X122Y139  M10 Q255 (fire on)
+M11 (tool off)
+G0 X123.5 Y140.5 
+M3 (tool on)
+G1 X132.5Y131.5  M10 Q255 (fire on)
+G1 X140Y139  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X126.5  M10 Q255 (fire on)
+G1 Y151  M10 Q255 (fire on)
+G1 X140  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X132.5Y158.5  M10 Q255 (fire on)
+G1 X123.5Y149.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X122 Y151 
+M3 (tool on)
+G1 X131Y160  M10 Q255 (fire on)
+G1 X123.5Y167.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y154  M10 Q255 (fire on)
+G1 X111.5  M10 Q255 (fire on)
+G1 Y167.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X104Y160  M10 Q255 (fire on)
+G1 X113Y151  M10 Q255 (fire on)
+M11 (tool off)
+G0 X111.5 Y149.5 
+M3 (tool on)
+G1 X102.5Y158.5  M10 Q255 (fire on)
+G1 X95Y151  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X108.5  M10 Q255 (fire on)
+G1 Y139  M10 Q255 (fire on)
+G1 X95  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 X102.5Y131.5  M10 Q255 (fire on)
+G1 X111.5Y140.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y139 
+M3 (tool on)
+G1 Y139.288  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y139.788 
+M3 (tool on)
+G1 Y150.116  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y150.616 
+M3 (tool on)
+G1 Y151  M10 Q255 (fire on)
+G1 X123.5  M10 Q255 (fire on)
+G1 Y150.691  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y150.191 
+M3 (tool on)
+G1 Y139.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X123.25 Y139 
+M3 (tool on)
+G1 X111.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X113  
+M3 (tool on)
+G1 X104Y130  M10 Q255 (fire on)
+G1 X111.5Y122.5  M10 Q255 (fire on)
+M11 (tool off)
+G0 X153.5 Y124 
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.5  
+M3 (tool on)
+G1 Y109.25  M10 Q255 (fire on)
+M11 (tool off)
+G0 X158.75 Y109 
+M3 (tool on)
+G1 X170.5  M10 Q255 (fire on)
+G1 Y120.287  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y120.787 
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+G1 X169.81  M10 Q255 (fire on)
+M11 (tool off)
+G0 X169.31  
+M3 (tool on)
+G1 X158.5  M10 Q255 (fire on)
+M11 (tool off)
+G0   
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+M11 (tool off)
+G0 X140 Y152.5 
+M3 (tool on)
+G1 Y152.184  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y151.684 
+M3 (tool on)
+G1 Y145.682  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y145.182 
+M3 (tool on)
+G1 Y138.359  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y137.859 
+M3 (tool on)
+G1 Y137.5  M10 Q255 (fire on)
+G1 X147.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X147.559  
+M3 (tool on)
+G1 X155  M10 Q255 (fire on)
+G1 Y152.5  M10 Q255 (fire on)
+G1 X147.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X147.25  
+M3 (tool on)
+G1 X140  M10 Q255 (fire on)
+M11 (tool off)
+G0 X110 Y167.5 
+M3 (tool on)
+G1 Y167.816  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y168.316 
+M3 (tool on)
+G1 Y174.318  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y174.818 
+M3 (tool on)
+G1 Y181.641  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y182.141 
+M3 (tool on)
+G1 Y182.5  M10 Q255 (fire on)
+G1 X117.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X117.559  
+M3 (tool on)
+G1 X125  M10 Q255 (fire on)
+G1 Y182.029  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y181.529 
+M3 (tool on)
+G1 Y175.25  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y174.75 
+M3 (tool on)
+G1 Y168.465  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y167.965 
+M3 (tool on)
+G1 Y167.5  M10 Q255 (fire on)
+G1 X117.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X117.25  
+M3 (tool on)
+G1 X110  M10 Q255 (fire on)
+M11 (tool off)
+G0 X63 Y152.5 
+M3 (tool on)
+G1 Y152.184  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y151.684 
+M3 (tool on)
+G1 Y145.682  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y145.182 
+M3 (tool on)
+G1 Y138.359  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y137.859 
+M3 (tool on)
+G1 Y137.5  M10 Q255 (fire on)
+G1 X70.059  M10 Q255 (fire on)
+M11 (tool off)
+G0 X70.559  
+M3 (tool on)
+G1 X78  M10 Q255 (fire on)
+G1 Y152.5  M10 Q255 (fire on)
+G1 X70.75  M10 Q255 (fire on)
+M11 (tool off)
+G0 X70.25  
+M3 (tool on)
+G1 X63  M10 Q255 (fire on)
+M11 (tool off)
+G0 X202 Y169 
+M3 (tool on)
+G1 X209.5Y161.5  M10 Q255 (fire on)
+G1 X218.5Y170.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y137.5 
+M3 (tool on)
+G1 Y124  M10 Q255 (fire on)
+G1 X230.5  M10 Q255 (fire on)
+G1 Y137.5  M10 Q255 (fire on)
+M11 (tool off)
+G0  Y124 
+M3 (tool on)
+G1 Y121  M10 Q255 (fire on)
+M11 (tool off)
+G0 X218.5 Y66 
+M3 (tool on)
+G1 X209.5Y57  M10 Q255 (fire on)
+G1 X202Y64.5  M10 Q255 (fire on)
+(air off)
+M11 (tool off)
+G90(Restore absolute mode)
+M30
+M2
+G0 X0 Y0 Z100
