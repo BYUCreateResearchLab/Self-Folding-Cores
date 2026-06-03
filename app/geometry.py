@@ -288,15 +288,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         cx = x + self.cell_size / 2
         cy = y + self.cell_size / 2
 
-        self.draw_solid_line((tl_x, tl_y - d_center), (cx, cy - d_center), style)
-        self.draw_solid_line((cx + d_center, cy), (br_x + d_center, br_y), style)
-        self.draw_solid_line((tl_x - d_center, tl_y), (cx - d_center, cy), style)
-        self.draw_solid_line((cx, cy + d_center), (br_x, br_y + d_center), style)
+        self.draw_solid_line((tl_x, tl_y - m_tl_x), (cx, cy - d_center), style)
+        self.draw_solid_line((cx + d_center, cy), (br_x + m_br_x, br_y), style)
+        self.draw_solid_line((tl_x - m_tl_x, tl_y), (cx - d_center, cy), style)
+        self.draw_solid_line((cx, cy + d_center), (br_x, br_y + m_br_x), style)
 
-        self.draw_solid_line((bl_x - d_center, bl_y), (cx - d_center, cy), style)
-        self.draw_solid_line((cx, cy - d_center), (tr_x, tr_y - d_center), style)
-        self.draw_solid_line((bl_x, bl_y + d_center), (cx, cy + d_center), style)
-        self.draw_solid_line((cx + d_center, cy), (tr_x + d_center, tr_y), style)
+        self.draw_solid_line((bl_x - m_bl_x, bl_y), (cx - d_center, cy), style)
+        self.draw_solid_line((cx, cy - d_center), (tr_x, tr_y - m_tr_x), style)
+        self.draw_solid_line((bl_x, bl_y + m_bl_x), (cx, cy + d_center), style)
+        self.draw_solid_line((cx + d_center, cy), (tr_x + m_tr_x, tr_y), style)
 
     def _draw_boundary_gaps(self, is_inverted, style):
         # Top boundary
@@ -476,16 +476,16 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         m_br_x, m_br_y = self.get_margins(row + 1, col + 1, is_red_layer=is_red_layer)
 
         P_T1 = (x, y - m_tl_y) if is_tl_large else (x + m_tl_x, y - m_tl_y)
-        P_T2 = (x + self.cell_size - m_tr_x, y - m_tr_y) if is_tl_large else (x + self.cell_size, y - m_tr_y)
+        P_T2 = (x + self.cell_size - m_tr_x, y - m_tr_y) if is_tr_large else (x + self.cell_size, y - m_tr_y)
         
         P_B1 = (x, y + self.cell_size + m_bl_y) if is_bl_large else (x + m_bl_x, y + self.cell_size + m_bl_y)
-        P_B2 = (x + self.cell_size - m_br_x, y + self.cell_size + m_br_y) if is_bl_large else (x + self.cell_size, y + self.cell_size + m_br_y)
+        P_B2 = (x + self.cell_size - m_br_x, y + self.cell_size + m_br_y) if is_br_large else (x + self.cell_size, y + self.cell_size + m_br_y)
         
         P_L1 = (x - m_tl_x, y) if is_tl_large else (x - m_tl_x, y + m_tl_y)
-        P_L2 = (x - m_bl_x, y + self.cell_size - m_bl_y) if is_tl_large else (x - m_bl_x, y + self.cell_size)
+        P_L2 = (x - m_bl_x, y + self.cell_size - m_bl_y) if is_bl_large else (x - m_bl_x, y + self.cell_size)
         
         P_R1 = (x + self.cell_size + m_tr_x, y) if is_tr_large else (x + self.cell_size + m_tr_x, y + m_tr_y)
-        P_R2 = (x + self.cell_size + m_br_x, y + self.cell_size - m_br_y) if is_tr_large else (x + self.cell_size + m_br_x, y + self.cell_size)
+        P_R2 = (x + self.cell_size + m_br_x, y + self.cell_size - m_br_y) if is_br_large else (x + self.cell_size + m_br_x, y + self.cell_size)
 
         v_tl = self._line_intersection(P_T1, P_T2, P_L1, P_L2)
         v_tr = self._line_intersection(P_T1, P_T2, P_R1, P_R2)
