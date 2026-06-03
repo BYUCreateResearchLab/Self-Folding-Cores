@@ -12,9 +12,10 @@ class VariableGeometryGenerator:
         
         self.canvas_width = cols * cell_size
         self.canvas_height = rows * cell_size
-        self.stroke_style = {'stroke': 'white', 'stroke_width': 0.2, 'fill': 'none'}
+        self.stroke_style = {'stroke': 'black', 'stroke_width': 0.2, 'fill': 'none'}
         self.red_stroke_style = {'stroke': 'red', 'stroke_width': 0.2, 'fill': 'none'}
         self.green_stroke_style = {'stroke': '#00ff00', 'stroke_width': 0.2, 'fill': 'none'}
+        self.sheet_style = {'stroke': 'blue', 'stroke_width': 0.4, 'fill': 'none'}
         
         self.current_dwg = None
 
@@ -45,6 +46,12 @@ class VariableGeometryGenerator:
             size=("100%", "100%"),
             viewBox=f"{-padding} {-padding} {vw} {vh}"
         )
+
+    def _translate_point(self, point):
+        return (point[0] + self.offset_x, point[1] + self.offset_y)
+
+    def _translate_points(self, points):
+        return [self._translate_point(point) for point in points]
 
     def draw_solid_line(self, p1, p2, style=None):
         if style is None: style = self.stroke_style
@@ -138,9 +145,21 @@ class VariableTabbedGrid(VariableGeometryGenerator):
     def _draw_10x10_grid(self):
         grid_style = {'stroke': '#444444', 'stroke_width': 0.1, 'fill': 'none', 'stroke-dasharray': '2,2'}
         for x in range(0, int(self.canvas_width) + 1, 10):
-            self.current_dwg.add(self.current_dwg.line(start=(x, 0), end=(x, self.canvas_height), **grid_style))
+            self.current_dwg.add(
+                self.current_dwg.line(
+                    start=self._translate_point((x, 0)),
+                    end=self._translate_point((x, self.canvas_height)),
+                    **grid_style
+                )
+            )
         for y in range(0, int(self.canvas_height) + 1, 10):
-            self.current_dwg.add(self.current_dwg.line(start=(0, y), end=(self.canvas_width, y), **grid_style))
+            self.current_dwg.add(
+                self.current_dwg.line(
+                    start=self._translate_point((0, y)),
+                    end=self._translate_point((self.canvas_width, y)),
+                    **grid_style
+                )
+            )
 
     def _draw_grid_layer(self, is_inverted, style):
         for row in range(self.rows):

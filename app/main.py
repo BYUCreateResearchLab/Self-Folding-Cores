@@ -1,17 +1,41 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import base64
 from geometry import VariableTabbedGrid
 
 # Trigger Streamlit to reload to pick up geometry.py changes
 st.set_page_config(layout="wide", page_title="Self-Folding Cores UI")
 
+st.markdown(
+    """
+    <style>
+        body, .stApp, .main, .block-container {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+        section[data-testid="stSidebar"] {
+            background-color: #d3d3d3 !important;
+        }
+        .css-1ynx3rn {
+            background-color: #d3d3d3 !important;
+        }
+        .stButton button, .stDownloadButton button {
+            background-color: #111111 !important;
+            color: #ffffff !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.sidebar.title("Parameters")
 
 st.sidebar.subheader("Visualization")
-show_base = st.sidebar.checkbox("Museum Board Base (White Layer)", value=True)
+show_base = st.sidebar.checkbox("Museum Board Base (Black Layer)", value=True)
 show_top = st.sidebar.checkbox("Museum Board Top (Green Layer)", value=True)
 show_red = st.sidebar.checkbox("Shrinky Dink / Tape Sheets (Red Layer)", value=True)
 show_grid = st.sidebar.checkbox("Show 10x10mm Grid", value=True)
+show_sheet = st.sidebar.checkbox("8.5\" x 11\" landscape boundary (279mm × 216mm)", value=True)
 zoom_level = st.sidebar.slider("Preview Zoom (%)", 10, 1000, 100, 10)
 
 st.sidebar.subheader("Grid Dimensions")
@@ -54,13 +78,97 @@ with col1:
     st.markdown("### Preview")
     b64 = base64.b64encode(svg_str.encode('utf-8')).decode("utf-8")
     
-    # CSS wrapper for panning and zooming the SVG
-    html = f'''
-    <div style="width: 100%; height: 75vh; overflow: auto; background-color: #1e1e1e; border: 1px solid #444; border-radius: 5px; padding: 20px;">
-        <img src="data:image/svg+xml;base64,{b64}" style="width: {zoom_level}%; max-width: none;"/>
+    # CSS wrapper for panning and zooming the SVG, with drag support and zoom controls
+    html = """
+    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <button id="zoom-in" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom In</button>
+        <button id="zoom-out" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom Out</button>
+        <button id="reset-view" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Reset View</button>
+        <div id="zoom-label" style="align-self: center; color: #fff;">{ZOOM}%</div>
     </div>
-    '''
-    st.markdown(html, unsafe_allow_html=True)
+    <div id="draggable-preview" style="position: relative; width: 100%; height: 75vh; overflow: auto; background-color: #ffffff; border: 1px solid #444; border-radius: 5px; padding: 20px; cursor: grab;">
+        <img id="preview-img" src="data:image/svg+xml;base64,{B64}" style="width: {ZOOM}%; max-width: none; display: block;"/>
+    </div>
+    <script>
+        const preview = document.getElementById('draggable-preview');
+        const previewImg = document.getElementById('preview-img');
+        const zoomLabel = document.getElementById('zoom-label');
+        const zoomInButton = document.getElementById('zoom-in');
+        const zoomOutButton = document.getElementById('zoom-out');
+        const resetButton = document.getElementById('reset-view');
+
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let startScrollLeft = 0;
+        let startScrollTop = 0;
+        let currentZoom = {ZOOM};
+
+        const updateZoom = () => {
+            previewImg.style.width = currentZoom + '%';
+            zoomLabel.textContent = currentZoom + '%';
+        };
+
+        zoomInButton.addEventListener('click', () => {
+            currentZoom = Math.min(200, currentZoom + 10);
+            updateZoom();
+        });
+
+        zoomOutButton.addEventListener('click', () => {
+            currentZoom = Math.max(10, currentZoom - 10);
+            updateZoom();
+        });
+
+        resetButton.addEventListener('click', () => {
+            currentZoom = {ZOOM};
+            preview.scrollLeft = 0;
+            preview.scrollTop = 0;
+            updateZoom();
+        });
+
+        preview.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            const delta = event.deltaY > 0 ? -10 : 10;
+            currentZoom = Math.min(200, Math.max(10, currentZoom + delta));
+            updateZoom();
+        });
+
+        preview.addEventListener('pointerdown', (event) => {
+            if (event.target.tagName === 'BUTTON') return;
+            event.preventDefault();
+            isDragging = true;
+            preview.style.cursor = 'grabbing';
+            startX = event.clientX;
+            startY = event.clientY;
+            startScrollLeft = preview.scrollLeft;
+            startScrollTop = preview.scrollTop;
+            preview.setPointerCapture(event.pointerId);
+        });
+
+        preview.addEventListener('pointermove', (event) => {
+            if (!isDragging) return;
+            const dx = event.clientX - startX;
+            const dy = event.clientY - startY;
+            preview.scrollLeft = startScrollLeft - dx;
+            preview.scrollTop = startScrollTop - dy;
+        });
+
+        preview.addEventListener('pointerup', (event) => {
+            if (!isDragging) return;
+            isDragging = false;
+            preview.style.cursor = 'grab';
+            preview.releasePointerCapture(event.pointerId);
+        });
+
+        preview.addEventListener('pointerleave', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            preview.style.cursor = 'grab';
+        });
+    </script>
+    """
+    html = html.replace( '{B64}', b64 ).replace( '{ZOOM}', str(zoom_level) )
+    components.html(html, height=820)
 
 with col2:
     st.markdown("### Export Full SVG")
