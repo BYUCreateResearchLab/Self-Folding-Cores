@@ -1,13 +1,14 @@
 import svgwrite
 import math
+from gcode import GCodeWriter
 
 class VariableGeometryGenerator:
-    def __init__(self, cols, rows, cell_size, normal_gap, alt_gap, bridge_size):
+    def __init__(self, cols, rows, cell_size, min_margin, max_margin, bridge_size):
         self.cols = cols
         self.rows = rows
         self.cell_size = cell_size
-        self.normal_gap = normal_gap
-        self.alt_gap = alt_gap
+        self.min_margin = min_margin
+        self.max_margin = max_margin
         self.bridge_size = bridge_size
         
         self.canvas_width = cols * cell_size
@@ -17,28 +18,18 @@ class VariableGeometryGenerator:
         self.green_stroke_style = {'stroke': '#00ff00', 'stroke_width': 0.2, 'fill': 'none'}
         
         self.current_dwg = None
+        self.current_dwg_active = True
+        self.current_gcodes = []
 
-    def get_margin(self, row, col, is_inverted=False, is_red_layer=False):
-        if is_red_layer:
-            return self.normal_gap
-        if not is_inverted:
-            return self.normal_gap
-            
-        # For x-tabs (odd row and odd col), maintain the normal gap width
-        if row % 2 != 0 and col % 2 != 0:
-            return self.normal_gap
-            
-        is_large_square = (row // 2 + col // 2) % 2 == 0
-        if is_inverted:
-            is_large_square = not is_large_square
-            
-        if not is_large_square:
-            return self.alt_gap
-        else:
-            return self.normal_gap
+    def get_margin(self, row, col):
+        if self.cols <= 1: return self.min_margin
+        progress = col / (self.cols - 1)
+        return self.min_margin + (self.max_margin - self.min_margin) * progress
 
-    def get_tab_width(self, row, col, is_inverted=False, is_red_layer=False):
-        return self.get_margin(row, col, is_inverted, is_red_layer) * math.sqrt(2)
+    def get_tab_width(self, row, col):
+        # Dynamically scale tab width based on margin to prevent intersections.
+        # Multiplying by sqrt(2) ensures the tab's offset 'd' exactly equals the local margin.
+        return self.get_margin(row, col) * math.sqrt(2)
 
     def create_drawing(self):
         padding = 50
@@ -51,14 +42,18 @@ class VariableGeometryGenerator:
 
     def draw_solid_line(self, p1, p2, style=None):
         if style is None: style = self.stroke_style
-        if self.current_dwg:
+        if self.current_dwg and self.current_dwg_active:
             self.current_dwg.add(self.current_dwg.line(start=p1, end=p2, **style))
+        for gc in self.current_gcodes:
+            gc.add_line(p1, p2)
             
     def draw_polygon(self, points, style=None):
         if style is None: style = self.stroke_style
         if not points: return
-        if self.current_dwg:
+        if self.current_dwg and self.current_dwg_active:
             self.current_dwg.add(self.current_dwg.polygon(points=points, **style))
+        for gc in self.current_gcodes:
+            gc.add_polygon(points)
 
     def has_xtab(self, r, c):
         return 0 <= r < self.rows and 0 <= c < self.cols
@@ -112,31 +107,63 @@ class VariableGeometryGenerator:
 
 
 class VariableTabbedGrid(VariableGeometryGenerator):
-    def generate(self, show_base, show_top, show_red, show_grid):
+    def generate(self, show_base, show_top, show_red, show_grid, gcode_settings, generate_gcode=True):
         self.current_dwg = self.create_drawing()
         
-        # 1. 10x10 Grid (Visual only)
+        # 1. 10x10 Grid (Visual only, no GCode)
         if show_grid:
+            self.current_dwg_active = True
+            self.current_gcodes = []
             self._draw_10x10_grid()
 
+        gcodes_out = {}
+
         # 2. Museum Board Base (White Layer)
-        if show_base:
-            self._draw_grid_layer(is_inverted=False, style=self.stroke_style)
-            self._draw_boundary_gaps(is_inverted=False, style=self.stroke_style)
+        if generate_gcode:
+            gc_base = GCodeWriter(**gcode_settings['museum'])
+            gc_base.set_layer("Museum Board Base")
+            self.current_gcodes = [gc_base]
+        else:
+            self.current_gcodes = []
+        self.current_dwg_active = show_base
+        self._draw_grid_layer(is_inverted=False, style=self.stroke_style)
+        self._draw_boundary_gaps(is_inverted=False, style=self.stroke_style)
+        if generate_gcode:
+            gcodes_out['base'] = gc_base.get_gcode()
 
         # 3. Museum Board Top (Green Layer)
-        if show_top:
-            self._draw_grid_layer(is_inverted=True, style=self.green_stroke_style)
-            self._draw_boundary_gaps(is_inverted=True, style=self.green_stroke_style)
+        if generate_gcode:
+            gc_top = GCodeWriter(**gcode_settings['museum'])
+            gc_top.set_layer("Museum Board Top")
+            self.current_gcodes = [gc_top]
+        else:
+            self.current_gcodes = []
+        self.current_dwg_active = show_top
+        self._draw_grid_layer(is_inverted=True, style=self.green_stroke_style)
+        self._draw_boundary_gaps(is_inverted=True, style=self.green_stroke_style)
+        if generate_gcode:
+            gcodes_out['top'] = gc_top.get_gcode()
 
-        # 4. Shrinky Dink & Tape Sheets (Red Layer)
-        if show_red:
-            self._draw_red_layer()
+        # 4. Shrinky Dink & Tape Sheets (Red Layer outputs to BOTH gc_shrinky and gc_tape simultaneously)
+        if generate_gcode:
+            gc_shrinky = GCodeWriter(**gcode_settings['shrinky'])
+            gc_shrinky.set_layer("Shrinky Dink")
+            gc_tape = GCodeWriter(**gcode_settings['tape'])
+            gc_tape.set_layer("Tape Sheets")
+            self.current_gcodes = [gc_shrinky, gc_tape]
+        else:
+            self.current_gcodes = []
+        self.current_dwg_active = show_red
+        self._draw_red_layer()
+        if generate_gcode:
+            gcodes_out['shrinky'] = gc_shrinky.get_gcode()
+            gcodes_out['tape'] = gc_tape.get_gcode()
 
         # Finalize
         svg_str = self.current_dwg.tostring()
         self.current_dwg = None
-        return svg_str
+        self.current_gcodes = []
+        return svg_str, gcodes_out
 
     def _draw_10x10_grid(self):
         grid_style = {'stroke': '#444444', 'stroke_width': 0.1, 'fill': 'none', 'stroke-dasharray': '2,2'}
@@ -151,7 +178,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                 x = col * self.cell_size
                 y = row * self.cell_size
                 
-                m = self.get_margin(row, col, is_inverted)
+                m = self.get_margin(row, col)
 
                 if row % 2 == 0 and col % 2 == 0:
                     is_large_square = (row // 2 + col // 2) % 2 == 0
@@ -164,8 +191,8 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                         self.draw_square(x + m, y + m, size, False, row, col, style)
 
                 elif row % 2 == 0 and col % 2 != 0:
-                    m_left = self.get_margin(row, col - 1, is_inverted)
-                    m_right = self.get_margin(row, col + 1, is_inverted)
+                    m_left = self.get_margin(row, col - 1)
+                    m_right = self.get_margin(row, col + 1)
                     y1_L, y2_L = y + m_left, y + self.cell_size - m_left
                     y1_R, y2_R = y + m_right, y + self.cell_size - m_right
 
@@ -184,8 +211,8 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                         self.draw_solid_line((start_x, y2_L), (end_x, y2_R), style)
 
                 elif row % 2 != 0 and col % 2 == 0:
-                    m_top = self.get_margin(row - 1, col, is_inverted)
-                    m_bottom = self.get_margin(row + 1, col, is_inverted)
+                    m_top = self.get_margin(row - 1, col)
+                    m_bottom = self.get_margin(row + 1, col)
                     x1_T, x2_T = x + m_top, x + self.cell_size - m_top
                     x1_B, x2_B = x + m_bottom, x + self.cell_size - m_bottom
 
@@ -207,7 +234,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     self._draw_x_tabs(x, y, row, col, is_inverted, style)
 
     def _draw_x_tabs(self, x, y, row, col, is_inverted, style):
-        local_tab_width = self.get_tab_width(row, col, is_inverted)
+        local_tab_width = self.get_tab_width(row, col)
         d = local_tab_width / math.sqrt(2)
 
         is_tl_large = ((row - 1) // 2 + (col - 1) // 2) % 2 == 0
@@ -221,10 +248,10 @@ class VariableTabbedGrid(VariableGeometryGenerator):
             is_bl_large = not is_bl_large
             is_br_large = not is_br_large
 
-        m_tl = self.get_margin(row - 1, col - 1, is_inverted)
-        m_tr = self.get_margin(row - 1, col + 1, is_inverted)
-        m_bl = self.get_margin(row + 1, col - 1, is_inverted)
-        m_br = self.get_margin(row + 1, col + 1, is_inverted)
+        m_tl = self.get_margin(row - 1, col - 1)
+        m_tr = self.get_margin(row - 1, col + 1)
+        m_bl = self.get_margin(row + 1, col - 1)
+        m_br = self.get_margin(row + 1, col + 1)
 
         tl_x = x if is_tl_large else x - m_tl
         tl_y = y if is_tl_large else y - m_tl
@@ -259,15 +286,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
             if col % 2 == 0:
                 is_large = (row // 2 + col // 2) % 2 == 0
                 if is_inverted: is_large = not is_large
-                m = self.get_margin(row, col, is_inverted)
+                m = self.get_margin(row, col)
                 TR = (x + self.cell_size, y) if is_large else (x + self.cell_size - m, y + m)
                 
-                m_left = self.get_margin(row, col, is_inverted)
+                m_left = self.get_margin(row, col)
                 left_is_large = is_large
                 TL_next = (next_x, y + m_left) if left_is_large else (next_x + m_left, y + m_left)
                 self.draw_solid_line(TR, TL_next, style)
             else:
-                m_right = self.get_margin(row, col + 1, is_inverted)
+                m_right = self.get_margin(row, col + 1)
                 right_is_large = (row // 2 + (col + 1) // 2) % 2 == 0
                 if is_inverted: right_is_large = not right_is_large
                 TR = (x + self.cell_size, y + m_right) if right_is_large else (x + self.cell_size - m_right, y + m_right)
@@ -284,15 +311,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
             if col % 2 == 0:
                 is_large = (row // 2 + col // 2) % 2 == 0
                 if is_inverted: is_large = not is_large
-                m = self.get_margin(row, col, is_inverted)
+                m = self.get_margin(row, col)
                 BR = (x + self.cell_size, y_bottom) if is_large else (x + self.cell_size - m, y_bottom - m)
                 
-                m_left = self.get_margin(row, col, is_inverted)
+                m_left = self.get_margin(row, col)
                 left_is_large = is_large
                 BL_next = (next_x, y_bottom - m_left) if left_is_large else (next_x + m_left, y_bottom - m_left)
                 self.draw_solid_line(BR, BL_next, style)
             else:
-                m_right = self.get_margin(row, col + 1, is_inverted)
+                m_right = self.get_margin(row, col + 1)
                 right_is_large = (row // 2 + (col + 1) // 2) % 2 == 0
                 if is_inverted: right_is_large = not right_is_large
                 BR = (x + self.cell_size, y_bottom - m_right) if right_is_large else (x + self.cell_size - m_right, y_bottom - m_right)
@@ -308,15 +335,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
             if row % 2 == 0:
                 is_large = (row // 2 + col // 2) % 2 == 0
                 if is_inverted: is_large = not is_large
-                m = self.get_margin(row, col, is_inverted)
+                m = self.get_margin(row, col)
                 BL = (x, y + self.cell_size) if is_large else (x + m, y + self.cell_size - m)
                 
-                m_top = self.get_margin(row, col, is_inverted)
+                m_top = self.get_margin(row, col)
                 top_is_large = is_large
                 TL_next = (x + m_top, next_y) if top_is_large else (x + m_top, next_y + m_top)
                 self.draw_solid_line(BL, TL_next, style)
             else:
-                m_bottom = self.get_margin(row + 1, col, is_inverted)
+                m_bottom = self.get_margin(row + 1, col)
                 bottom_is_large = ((row + 1) // 2 + col // 2) % 2 == 0
                 if is_inverted: bottom_is_large = not bottom_is_large
                 BL = (x + m_bottom, y + self.cell_size) if bottom_is_large else (x + m_bottom, y + self.cell_size - m_bottom)
@@ -333,15 +360,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
             if row % 2 == 0:
                 is_large = (row // 2 + col // 2) % 2 == 0
                 if is_inverted: is_large = not is_large
-                m = self.get_margin(row, col, is_inverted)
+                m = self.get_margin(row, col)
                 BR = (x_right, y + self.cell_size) if is_large else (x_right - m, y + self.cell_size - m)
                 
-                m_top = self.get_margin(row, col, is_inverted)
+                m_top = self.get_margin(row, col)
                 top_is_large = is_large
                 TR_next = (x_right - m_top, next_y) if top_is_large else (x_right - m_top, next_y + m_top)
                 self.draw_solid_line(BR, TR_next, style)
             else:
-                m_bottom = self.get_margin(row + 1, col, is_inverted)
+                m_bottom = self.get_margin(row + 1, col)
                 bottom_is_large = ((row + 1) // 2 + col // 2) % 2 == 0
                 if is_inverted: bottom_is_large = not bottom_is_large
                 BR = (x_right - m_bottom, y + self.cell_size) if bottom_is_large else (x_right - m_bottom, y + self.cell_size - m_bottom)
@@ -363,16 +390,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
 
     def _draw_red_layer(self):
         points = []
-        is_red_layer = True
         # Top
         row, y = 0, 0
         for col in range(self.cols):
             x = col * self.cell_size
             if col % 2 == 0:
-                m = self.get_margin(row, col, is_red_layer=is_red_layer)
+                m = self.get_margin(row, col)
                 points.extend([(x + m, y + m), (x + self.cell_size - m, y + m)])
             else:
-                m_left, m_right = self.get_margin(row, col - 1, is_red_layer=is_red_layer), self.get_margin(row, col + 1, is_red_layer=is_red_layer)
+                m_left, m_right = self.get_margin(row, col - 1), self.get_margin(row, col + 1)
                 points.extend([(x + m_left, y + m_left), (x + self.cell_size - m_right, y + m_right)])
 
         # Right
@@ -381,10 +407,10 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         for row in range(self.rows):
             y = row * self.cell_size
             if row % 2 == 0:
-                m = self.get_margin(row, col, is_red_layer=is_red_layer)
+                m = self.get_margin(row, col)
                 points.extend([(x_right - m, y + m), (x_right - m, y + self.cell_size - m)])
             else:
-                m_top, m_bottom = self.get_margin(row - 1, col, is_red_layer=is_red_layer), self.get_margin(row + 1, col, is_red_layer=is_red_layer)
+                m_top, m_bottom = self.get_margin(row - 1, col), self.get_margin(row + 1, col)
                 points.extend([(x_right - m_top, y + m_top), (x_right - m_bottom, y + self.cell_size - m_bottom)])
 
         # Bottom
@@ -393,10 +419,10 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         for col in range(self.cols - 1, -1, -1):
             x = col * self.cell_size
             if col % 2 == 0:
-                m = self.get_margin(row, col, is_red_layer=is_red_layer)
+                m = self.get_margin(row, col)
                 points.extend([(x + self.cell_size - m, y_bottom - m), (x + m, y_bottom - m)])
             else:
-                m_left, m_right = self.get_margin(row, col - 1, is_red_layer=is_red_layer), self.get_margin(row, col + 1, is_red_layer=is_red_layer)
+                m_left, m_right = self.get_margin(row, col - 1), self.get_margin(row, col + 1)
                 points.extend([(x + self.cell_size - m_right, y_bottom - m_right), (x + m_left, y_bottom - m_left)])
 
         # Left
@@ -404,10 +430,10 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         for row in range(self.rows - 1, -1, -1):
             y = row * self.cell_size
             if row % 2 == 0:
-                m = self.get_margin(row, col, is_red_layer=is_red_layer)
+                m = self.get_margin(row, col)
                 points.extend([(x + m, y + self.cell_size - m), (x + m, y + m)])
             else:
-                m_top, m_bottom = self.get_margin(row - 1, col, is_red_layer=is_red_layer), self.get_margin(row + 1, col, is_red_layer=is_red_layer)
+                m_top, m_bottom = self.get_margin(row - 1, col), self.get_margin(row + 1, col)
                 points.extend([(x + m_bottom, y + self.cell_size - m_bottom), (x + m_top, y + m_top)])
 
         self.draw_polygon(points, self.red_stroke_style)
@@ -415,18 +441,18 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         for row in range(self.rows):
             for col in range(self.cols):
                 if row % 2 != 0 and col % 2 != 0:
-                    self._draw_red_cutout(col * self.cell_size, row * self.cell_size, row, col, is_red_layer)
+                    self._draw_red_cutout(col * self.cell_size, row * self.cell_size, row, col)
 
-    def _draw_red_cutout(self, x, y, row, col, is_red_layer):
+    def _draw_red_cutout(self, x, y, row, col):
         is_tl_large = ((row - 1) // 2 + (col - 1) // 2) % 2 == 0
         is_tr_large = ((row - 1) // 2 + (col + 1) // 2) % 2 == 0
         is_bl_large = ((row + 1) // 2 + (col - 1) // 2) % 2 == 0
         is_br_large = ((row + 1) // 2 + (col + 1) // 2) % 2 == 0
 
-        m_tl = self.get_margin(row - 1, col - 1, is_red_layer=is_red_layer)
-        m_tr = self.get_margin(row - 1, col + 1, is_red_layer=is_red_layer)
-        m_bl = self.get_margin(row + 1, col - 1, is_red_layer=is_red_layer)
-        m_br = self.get_margin(row + 1, col + 1, is_red_layer=is_red_layer)
+        m_tl = self.get_margin(row - 1, col - 1)
+        m_tr = self.get_margin(row - 1, col + 1)
+        m_bl = self.get_margin(row + 1, col - 1)
+        m_br = self.get_margin(row + 1, col + 1)
 
         P_T1 = (x, y - m_tl) if is_tl_large else (x + m_tl, y - m_tl)
         P_T2 = (x + self.cell_size - m_tr, y - m_tr) if is_tl_large else (x + self.cell_size, y - m_tr)
