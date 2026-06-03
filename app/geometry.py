@@ -255,7 +255,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     self._draw_x_tabs(x, y, row, col, is_inverted, style)
 
     def _draw_x_tabs(self, x, y, row, col, is_inverted, style):
-        d = self.normal_gap
+        d_center = self.normal_gap
 
         is_tl_large = ((row - 1) // 2 + (col - 1) // 2) % 2 == 0
         is_tr_large = ((row - 1) // 2 + (col + 1) // 2) % 2 == 0
@@ -288,15 +288,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         cx = x + self.cell_size / 2
         cy = y + self.cell_size / 2
 
-        self.draw_solid_line((tl_x, tl_y - d), (cx, cy - d), style)
-        self.draw_solid_line((cx + d, cy), (br_x + d, br_y), style)
-        self.draw_solid_line((tl_x - d, tl_y), (cx - d, cy), style)
-        self.draw_solid_line((cx, cy + d), (br_x, br_y + d), style)
+        self.draw_solid_line((tl_x, tl_y - d_center), (cx, cy - d_center), style)
+        self.draw_solid_line((cx + d_center, cy), (br_x + d_center, br_y), style)
+        self.draw_solid_line((tl_x - d_center, tl_y), (cx - d_center, cy), style)
+        self.draw_solid_line((cx, cy + d_center), (br_x, br_y + d_center), style)
 
-        self.draw_solid_line((bl_x - d, bl_y), (cx - d, cy), style)
-        self.draw_solid_line((cx, cy - d), (tr_x, tr_y - d), style)
-        self.draw_solid_line((bl_x, bl_y + d), (cx, cy + d), style)
-        self.draw_solid_line((cx + d, cy), (tr_x + d, tr_y), style)
+        self.draw_solid_line((bl_x - d_center, bl_y), (cx - d_center, cy), style)
+        self.draw_solid_line((cx, cy - d_center), (tr_x, tr_y - d_center), style)
+        self.draw_solid_line((bl_x, bl_y + d_center), (cx, cy + d_center), style)
+        self.draw_solid_line((cx + d_center, cy), (tr_x + d_center, tr_y), style)
 
     def _draw_boundary_gaps(self, is_inverted, style):
         # Top boundary
