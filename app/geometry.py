@@ -55,7 +55,7 @@ class VariableGeometryGenerator:
             vy = -padding
             
         return svgwrite.Drawing(
-            size=("100%", "100%"),
+            size=(f"{vw}mm", f"{vh}mm"),
             viewBox=f"{vx} {vy} {vw} {vh}"
         )
 
