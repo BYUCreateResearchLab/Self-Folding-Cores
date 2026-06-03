@@ -17,6 +17,8 @@ class VariableGeometryGenerator:
         self.green_stroke_style = {'stroke': '#00ff00', 'stroke_width': 0.2, 'fill': 'none'}
         self.sheet_style = {'stroke': 'blue', 'stroke_width': 0.4, 'fill': 'none'}
         
+        self.offset_x = 0
+        self.offset_y = 0
         self.current_dwg = None
 
     def get_margins(self, row, col, is_inverted=False, is_red_layer=False):
@@ -38,13 +40,23 @@ class VariableGeometryGenerator:
         else:
             return self.normal_gap, self.normal_gap
 
-    def create_drawing(self):
+    def create_drawing(self, show_sheet=False, sheet_w=279, sheet_h=216):
         padding = 50
-        vw = self.canvas_width + padding * 2
-        vh = self.canvas_height + padding * 2
+        if show_sheet:
+            vw = sheet_w + padding * 2
+            vh = sheet_h + padding * 2
+            # Set the viewbox to center around the sheet
+            vx = -padding
+            vy = -padding
+        else:
+            vw = self.canvas_width + padding * 2
+            vh = self.canvas_height + padding * 2
+            vx = -padding
+            vy = -padding
+            
         return svgwrite.Drawing(
             size=("100%", "100%"),
-            viewBox=f"{-padding} {-padding} {vw} {vh}"
+            viewBox=f"{vx} {vy} {vw} {vh}"
         )
 
     def _translate_point(self, point):
@@ -56,13 +68,13 @@ class VariableGeometryGenerator:
     def draw_solid_line(self, p1, p2, style=None):
         if style is None: style = self.stroke_style
         if self.current_dwg:
-            self.current_dwg.add(self.current_dwg.line(start=p1, end=p2, **style))
+            self.current_dwg.add(self.current_dwg.line(start=self._translate_point(p1), end=self._translate_point(p2), **style))
             
     def draw_polygon(self, points, style=None):
         if style is None: style = self.stroke_style
         if not points: return
         if self.current_dwg:
-            self.current_dwg.add(self.current_dwg.polygon(points=points, **style))
+            self.current_dwg.add(self.current_dwg.polygon(points=self._translate_points(points), **style))
 
     def has_xtab(self, r, c):
         return 0 <= r < self.rows and 0 <= c < self.cols
@@ -116,8 +128,27 @@ class VariableGeometryGenerator:
 
 
 class VariableTabbedGrid(VariableGeometryGenerator):
-    def generate(self, show_base, show_top, show_red, show_grid):
-        self.current_dwg = self.create_drawing()
+    def generate(self, show_base, show_top, show_red, show_grid, show_sheet=False):
+        sheet_w, sheet_h = 279, 216
+        if show_sheet:
+            self.offset_x = (sheet_w - self.canvas_width) / 2.0
+            self.offset_y = (sheet_h - self.canvas_height) / 2.0
+        else:
+            self.offset_x = 0
+            self.offset_y = 0
+
+        self.current_dwg = self.create_drawing(show_sheet, sheet_w, sheet_h)
+
+        if show_sheet:
+            # Draw the sheet boundary (already translated internally if we used draw_rectangle, 
+            # but we can just use dwg.rect directly since it's the bounding box)
+            self.current_dwg.add(
+                self.current_dwg.rect(
+                    insert=(0, 0),
+                    size=(sheet_w, sheet_h),
+                    **self.sheet_style
+                )
+            )
         
         # 1. 10x10 Grid (Visual only)
         if show_grid:

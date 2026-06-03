@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import base64
 from geometry import VariableTabbedGrid
 
@@ -14,10 +13,10 @@ st.markdown(
             color: #ffffff !important;
         }
         section[data-testid="stSidebar"] {
-            background-color: #d3d3d3 !important;
+            background-color: #000000 !important;
         }
         .css-1ynx3rn {
-            background-color: #d3d3d3 !important;
+            background-color: #000000 !important;
         }
         .stButton button, .stDownloadButton button {
             background-color: #111111 !important;
@@ -64,12 +63,12 @@ generator = VariableTabbedGrid(
 )
 
 svg_str = generator.generate(
-    show_base=show_base, 
-    show_top=show_top, 
-    show_red=show_red, 
-    show_grid=show_grid
+    show_base=show_base,
+    show_top=show_top,
+    show_red=show_red,
+    show_grid=show_grid,
+    show_sheet=show_sheet
 )
-
 st.title("Tessellation Visualizer")
 
 col1, col2 = st.columns([3, 1])
@@ -168,7 +167,7 @@ with col1:
     </script>
     """
     html = html.replace( '{B64}', b64 ).replace( '{ZOOM}', str(zoom_level) )
-    components.html(html, height=820)
+    st.iframe(html, height=820)
 
 with col2:
     st.markdown("### Export Full SVG")
