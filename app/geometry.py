@@ -3,6 +3,7 @@ import math
 
 class VariableGeometryGenerator:
     def __init__(self, cols, rows, cell_size, normal_gap, alt_gap, bridge_size):
+        self.scale = 3.7795275591  # 96 DPI scale for LightBurn (1mm = 3.7795px)
         self.cols = cols
         self.rows = rows
         self.cell_size = cell_size
@@ -12,10 +13,10 @@ class VariableGeometryGenerator:
         
         self.canvas_width = cols * cell_size
         self.canvas_height = rows * cell_size
-        self.stroke_style = {'stroke': 'black', 'stroke_width': 0.2, 'fill': 'none'}
-        self.red_stroke_style = {'stroke': 'red', 'stroke_width': 0.2, 'fill': 'none'}
-        self.green_stroke_style = {'stroke': '#00ff00', 'stroke_width': 0.2, 'fill': 'none'}
-        self.sheet_style = {'stroke': 'blue', 'stroke_width': 0.4, 'fill': 'none'}
+        self.stroke_style = {'stroke': 'black', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
+        self.red_stroke_style = {'stroke': 'red', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
+        self.green_stroke_style = {'stroke': 'blue', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
+        self.sheet_style = {'stroke': 'blue', 'stroke_width': 0.4 * self.scale, 'fill': 'none'}
         
         self.offset_x = 0
         self.offset_y = 0
@@ -54,13 +55,14 @@ class VariableGeometryGenerator:
             vx = -padding
             vy = -padding
             
+        scale = self.scale
         return svgwrite.Drawing(
             size=(f"{vw}mm", f"{vh}mm"),
-            viewBox=f"{vx} {vy} {vw} {vh}"
+            viewBox=f"{vx * scale} {vy * scale} {vw * scale} {vh * scale}"
         )
 
     def _translate_point(self, point):
-        return (point[0] + self.offset_x, point[1] + self.offset_y)
+        return ((point[0] + self.offset_x) * self.scale, (point[1] + self.offset_y) * self.scale)
 
     def _translate_points(self, points):
         return [self._translate_point(point) for point in points]
@@ -128,11 +130,11 @@ class VariableGeometryGenerator:
 
 
 class VariableTabbedGrid(VariableGeometryGenerator):
-    def generate(self, show_base, show_top, show_red, show_grid, show_sheet=False):
+    def generate(self, show_base, show_top, show_red, show_grid, show_sheet=False, align_x=5.0, align_y=5.0):
         sheet_w, sheet_h = 279, 216
         if show_sheet:
-            self.offset_x = (sheet_w - self.canvas_width) / 2.0
-            self.offset_y = (sheet_h - self.canvas_height) / 2.0
+            self.offset_x = align_x
+            self.offset_y = sheet_h - self.canvas_height - align_y
         else:
             self.offset_x = 0
             self.offset_y = 0
@@ -140,12 +142,11 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         self.current_dwg = self.create_drawing(show_sheet, sheet_w, sheet_h)
 
         if show_sheet:
-            # Draw the sheet boundary (already translated internally if we used draw_rectangle, 
-            # but we can just use dwg.rect directly since it's the bounding box)
+            # Draw the sheet boundary
             self.current_dwg.add(
                 self.current_dwg.rect(
                     insert=(0, 0),
-                    size=(sheet_w, sheet_h),
+                    size=(sheet_w * self.scale, sheet_h * self.scale),
                     **self.sheet_style
                 )
             )

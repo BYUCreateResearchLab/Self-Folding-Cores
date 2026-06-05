@@ -31,10 +31,15 @@ st.sidebar.title("Parameters")
 
 st.sidebar.subheader("Visualization")
 show_base = st.sidebar.checkbox("Museum Board Base (Black Layer)", value=True)
-show_top = st.sidebar.checkbox("Museum Board Top (Green Layer)", value=True)
+show_top = st.sidebar.checkbox("Museum Board Top (Blue Layer)", value=True)
 show_red = st.sidebar.checkbox("Shrinky Dink / Tape Sheets (Red Layer)", value=True)
 show_grid = st.sidebar.checkbox("Show 10x10mm Grid", value=True)
 show_sheet = st.sidebar.checkbox("8.5\" x 11\" landscape boundary (279mm × 216mm)", value=True)
+
+st.sidebar.subheader("Pattern Alignment on Sheet")
+align_x = st.sidebar.number_input("X Offset (mm)", value=5.0, step=1.0)
+align_y = st.sidebar.number_input("Y Offset (mm)", value=5.0, step=1.0)
+
 zoom_level = st.sidebar.slider("Preview Zoom (%)", 10, 1000, 100, 10)
 
 st.sidebar.subheader("Grid Dimensions")
@@ -48,7 +53,7 @@ alt_gap = st.sidebar.slider("Alternate Gap (mm)", 0.0, cell_size/2, 0.5, 0.1)
 bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.5, 0.1)
 
 # Create a signature for current settings to detect changes
-current_settings = (cols, rows, cell_size, normal_gap, alt_gap, bridge_size, show_base, show_top, show_red, show_grid)
+current_settings = (cols, rows, cell_size, normal_gap, alt_gap, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y)
 
 if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
     st.session_state.last_settings = current_settings
@@ -62,20 +67,35 @@ generator = VariableTabbedGrid(
     bridge_size=float(bridge_size)
 )
 
-svg_str = generator.generate(
+# Generate SVG for preview (with grid if enabled)
+svg_str_preview = generator.generate(
     show_base=show_base,
     show_top=show_top,
     show_red=show_red,
     show_grid=show_grid,
-    show_sheet=show_sheet
+    show_sheet=show_sheet,
+    align_x=align_x,
+    align_y=align_y
 )
+
+# Generate SVG for export (force grid off)
+svg_str_export = generator.generate(
+    show_base=show_base,
+    show_top=show_top,
+    show_red=show_red,
+    show_grid=False,
+    show_sheet=show_sheet,
+    align_x=align_x,
+    align_y=align_y
+)
+
 st.title("Tessellation Visualizer")
 
 col1, col2 = st.columns([3, 1])
 
 with col1:
     st.markdown("### Preview")
-    b64 = base64.b64encode(svg_str.encode('utf-8')).decode("utf-8")
+    b64 = base64.b64encode(svg_str_preview.encode('utf-8')).decode("utf-8")
     
     # CSS wrapper for panning and zooming the SVG, with drag support and zoom controls
     html = """
@@ -83,10 +103,10 @@ with col1:
         <button id="zoom-in" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom In</button>
         <button id="zoom-out" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom Out</button>
         <button id="reset-view" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Reset View</button>
-        <div id="zoom-label" style="align-self: center; color: #fff;">{ZOOM}%</div>
+        <div id="zoom-label" style="align-self: center; color: #fff;">100%</div>
     </div>
     <div id="draggable-preview" style="position: relative; width: 100%; height: 75vh; overflow: auto; background-color: #ffffff; border: 1px solid #444; border-radius: 5px; padding: 20px; cursor: grab;">
-        <img id="preview-img" src="data:image/svg+xml;base64,{B64}" style="width: {ZOOM}%; max-width: none; display: block;"/>
+        <img id="preview-img" src="data:image/svg+xml;base64,{B64}" style="width: 100%; max-width: none; display: block;"/>
     </div>
     <script>
         const preview = document.getElementById('draggable-preview');
@@ -96,20 +116,42 @@ with col1:
         const zoomOutButton = document.getElementById('zoom-out');
         const resetButton = document.getElementById('reset-view');
 
+        const stateKey = 'svg_viewer_state';
+        let savedState = JSON.parse(sessionStorage.getItem(stateKey)) || { zoom: {ZOOM}, scrollLeft: 0, scrollTop: 0 };
+        let currentZoom = savedState.zoom;
+
         let isDragging = false;
         let startX = 0;
         let startY = 0;
         let startScrollLeft = 0;
         let startScrollTop = 0;
-        let currentZoom = {ZOOM};
+
+        const saveState = () => {
+            sessionStorage.setItem(stateKey, JSON.stringify({
+                zoom: currentZoom,
+                scrollLeft: preview.scrollLeft,
+                scrollTop: preview.scrollTop
+            }));
+        };
 
         const updateZoom = () => {
             previewImg.style.width = currentZoom + '%';
             zoomLabel.textContent = currentZoom + '%';
+            saveState();
         };
 
+        // Initialize state
+        updateZoom();
+        // Delay setting scroll to ensure image is loaded and dimensions are calculated
+        setTimeout(() => {
+            preview.scrollLeft = savedState.scrollLeft;
+            preview.scrollTop = savedState.scrollTop;
+        }, 50);
+
+        preview.addEventListener('scroll', saveState);
+
         zoomInButton.addEventListener('click', () => {
-            currentZoom = Math.min(200, currentZoom + 10);
+            currentZoom = Math.min(1000, currentZoom + 10);
             updateZoom();
         });
 
@@ -128,7 +170,7 @@ with col1:
         preview.addEventListener('wheel', (event) => {
             event.preventDefault();
             const delta = event.deltaY > 0 ? -10 : 10;
-            currentZoom = Math.min(200, Math.max(10, currentZoom + delta));
+            currentZoom = Math.min(1000, Math.max(10, currentZoom + delta));
             updateZoom();
         });
 
@@ -150,6 +192,7 @@ with col1:
             const dy = event.clientY - startY;
             preview.scrollLeft = startScrollLeft - dx;
             preview.scrollTop = startScrollTop - dy;
+            saveState();
         });
 
         preview.addEventListener('pointerup', (event) => {
@@ -173,7 +216,7 @@ with col2:
     st.markdown("### Export Full SVG")
     st.download_button(
         label="Download SVG",
-        data=svg_str,
+        data=svg_str_export,
         file_name="tessellation.svg",
         mime="image/svg+xml"
     )
