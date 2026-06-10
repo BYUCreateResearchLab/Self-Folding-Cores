@@ -40,16 +40,14 @@ st.sidebar.subheader("Pattern Alignment on Sheet")
 align_x = st.sidebar.number_input("X Offset (mm)", value=5.0, step=1.0)
 align_y = st.sidebar.number_input("Y Offset (mm)", value=5.0, step=1.0)
 
-zoom_level = st.sidebar.slider("Preview Zoom (%)", 10, 1000, 100, 10)
-
 st.sidebar.subheader("Grid Dimensions")
 cols = st.sidebar.number_input("Columns", min_value=1, max_value=50, value=15)
 rows = st.sidebar.number_input("Rows", min_value=1, max_value=50, value=11)
 cell_size = st.sidebar.number_input("Cell Size (mm)", min_value=1.0, max_value=100.0, value=15.0)
 
 st.sidebar.subheader("Margins & Tabs")
-normal_gap = st.sidebar.slider("Normal Gap (mm)", 0.0, cell_size/2, 1.5, 0.1)
-alt_gap = st.sidebar.slider("Alternate Gap (mm)", 0.0, cell_size/2, 0.5, 0.1)
+normal_gap = st.sidebar.slider("Total Normal Gap (mm)", 0.0, float(cell_size), 3.0, 0.1)
+alt_gap = st.sidebar.slider("Total Alternate Gap (mm)", 0.0, float(cell_size), 1.0, 0.1)
 bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.5, 0.1)
 
 # Create a signature for current settings to detect changes
@@ -62,8 +60,8 @@ generator = VariableTabbedGrid(
     cols=int(cols), 
     rows=int(rows), 
     cell_size=float(cell_size), 
-    normal_gap=float(normal_gap), 
-    alt_gap=float(alt_gap), 
+    normal_gap=float(normal_gap) / 2.0, 
+    alt_gap=float(alt_gap) / 2.0, 
     bridge_size=float(bridge_size)
 )
 
@@ -209,7 +207,7 @@ with col1:
         });
     </script>
     """
-    html = html.replace( '{B64}', b64 ).replace( '{ZOOM}', str(zoom_level) )
+    html = html.replace( '{B64}', b64 ).replace( '{ZOOM}', "100" )
     st.iframe(html, height=820)
 
 with col2:

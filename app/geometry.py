@@ -153,7 +153,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         
         # 1. 10x10 Grid (Visual only)
         if show_grid:
-            self._draw_10x10_grid()
+            self._draw_10x10_grid(show_sheet, sheet_w, sheet_h)
 
         # 2. Museum Board Base (White Layer)
         if show_base:
@@ -174,24 +174,45 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         self.current_dwg = None
         return svg_str
 
-    def _draw_10x10_grid(self):
+    def _draw_10x10_grid(self, show_sheet=False, sheet_w=279, sheet_h=216):
         grid_style = {'stroke': '#444444', 'stroke_width': 0.1, 'fill': 'none', 'stroke-dasharray': '2,2'}
-        for x in range(0, int(self.canvas_width) + 1, 10):
-            self.current_dwg.add(
-                self.current_dwg.line(
-                    start=self._translate_point((x, 0)),
-                    end=self._translate_point((x, self.canvas_height)),
-                    **grid_style
+        
+        if show_sheet:
+            width = sheet_w
+            height = sheet_h
+            for x in range(0, int(width) + 1, 10):
+                self.current_dwg.add(
+                    self.current_dwg.line(
+                        start=(x * self.scale, 0),
+                        end=(x * self.scale, height * self.scale),
+                        **grid_style
+                    )
                 )
-            )
-        for y in range(0, int(self.canvas_height) + 1, 10):
-            self.current_dwg.add(
-                self.current_dwg.line(
-                    start=self._translate_point((0, y)),
-                    end=self._translate_point((self.canvas_width, y)),
-                    **grid_style
+            for y in range(0, int(height) + 1, 10):
+                self.current_dwg.add(
+                    self.current_dwg.line(
+                        start=(0, y * self.scale),
+                        end=(width * self.scale, y * self.scale),
+                        **grid_style
+                    )
                 )
-            )
+        else:
+            for x in range(0, int(self.canvas_width) + 1, 10):
+                self.current_dwg.add(
+                    self.current_dwg.line(
+                        start=self._translate_point((x, 0)),
+                        end=self._translate_point((x, self.canvas_height)),
+                        **grid_style
+                    )
+                )
+            for y in range(0, int(self.canvas_height) + 1, 10):
+                self.current_dwg.add(
+                    self.current_dwg.line(
+                        start=self._translate_point((0, y)),
+                        end=self._translate_point((self.canvas_width, y)),
+                        **grid_style
+                    )
+                )
 
     def _draw_grid_layer(self, is_inverted, style):
         for row in range(self.rows):
