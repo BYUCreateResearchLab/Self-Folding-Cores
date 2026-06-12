@@ -2,6 +2,9 @@ import streamlit as st
 import base64
 from geometry import VariableTabbedGrid
 
+def set_tess_pos(pos):
+    st.session_state.tessellation_position = pos
+
 # Trigger Streamlit to reload to pick up geometry.py changes
 st.set_page_config(layout="wide", page_title="Self-Folding Cores UI")
 
@@ -50,8 +53,12 @@ normal_gap = st.sidebar.slider("Total Normal Gap (mm)", 0.0, float(cell_size), 3
 alt_gap = st.sidebar.slider("Total Alternate Gap (mm)", 0.0, float(cell_size), 1.0, 0.1)
 bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.5, 0.1)
 
+# Keep tessellation selection state
+tessellation_position = st.session_state.get("tessellation_position", 9)  # Default to center (4)
+tessellation_tolerance = st.session_state.get("tess_tol", 0.0)
+
 # Create a signature for current settings to detect changes
-current_settings = (cols, rows, cell_size, normal_gap, alt_gap, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y)
+current_settings = (cols, rows, cell_size, normal_gap, alt_gap, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance)
 
 if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
     st.session_state.last_settings = current_settings
@@ -62,7 +69,9 @@ generator = VariableTabbedGrid(
     cell_size=float(cell_size), 
     normal_gap=float(normal_gap) / 2.0, 
     alt_gap=float(alt_gap) / 2.0, 
-    bridge_size=float(bridge_size)
+    bridge_size=float(bridge_size),
+    tessellation_position=tessellation_position,
+    tessellation_tolerance=tessellation_tolerance
 )
 
 # Generate SVG for preview (with grid if enabled)
@@ -97,14 +106,19 @@ with col1:
     
     # CSS wrapper for panning and zooming the SVG, with drag support and zoom controls
     html = """
-    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+    <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center;">
         <button id="zoom-in" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom In</button>
         <button id="zoom-out" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom Out</button>
         <button id="reset-view" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Reset View</button>
-        <div id="zoom-label" style="align-self: center; color: #fff;">100%</div>
+        <button id="measure-btn" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Measure: Off</button>
+        <div id="zoom-label" style="align-self: center; color: #fff; margin-left: 10px;">100%</div>
+        <div id="measure-label" style="align-self: center; color: #00ff00; margin-left: 10px; font-weight: bold;"></div>
     </div>
-    <div id="draggable-preview" style="position: relative; width: 100%; height: 75vh; overflow: auto; background-color: #ffffff; border: 1px solid #444; border-radius: 5px; padding: 20px; cursor: grab;">
-        <img id="preview-img" src="data:image/svg+xml;base64,{B64}" style="width: 100%; max-width: none; display: block;"/>
+    <div id="draggable-preview" style="position: relative; width: 100%; height: 75vh; overflow: hidden; background-color: #ffffff; border: 1px solid #444; border-radius: 5px; padding: 20px; cursor: grab;">
+        <img id="preview-img" src="data:image/svg+xml;base64,{B64}" style="width: 100%; max-width: none; display: block; pointer-events: none;"/>
+        <svg id="measure-overlay" style="position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); height: calc(100% - 40px); pointer-events: none; overflow: visible;">
+            <line id="measure-line" x1="0" y1="0" x2="0" y2="0" stroke="#00ff00" stroke-width="2" stroke-dasharray="4,4" display="none" />
+        </svg>
     </div>
     <script>
         const preview = document.getElementById('draggable-preview');
@@ -119,10 +133,27 @@ with col1:
         let currentZoom = savedState.zoom;
 
         let isDragging = false;
+        let isMeasuring = false;
+        let measureActive = false;
         let startX = 0;
         let startY = 0;
+        let measureStartX = 0;
+        let measureStartY = 0;
         let startScrollLeft = 0;
         let startScrollTop = 0;
+
+        const measureBtn = document.getElementById('measure-btn');
+        const measureLabel = document.getElementById('measure-label');
+        const measureLine = document.getElementById('measure-line');
+
+        measureBtn.addEventListener('click', () => {
+            isMeasuring = !isMeasuring;
+            measureBtn.textContent = isMeasuring ? 'Measure: On' : 'Measure: Off';
+            measureBtn.style.background = isMeasuring ? '#006600' : '#111';
+            preview.style.cursor = isMeasuring ? 'crosshair' : 'grab';
+            measureLine.style.display = 'none';
+            measureLabel.textContent = '';
+        });
 
         const saveState = () => {
             sessionStorage.setItem(stateKey, JSON.stringify({
@@ -166,44 +197,85 @@ with col1:
         });
 
         preview.addEventListener('wheel', (event) => {
-            event.preventDefault();
-            const delta = event.deltaY > 0 ? -10 : 10;
-            currentZoom = Math.min(1000, Math.max(10, currentZoom + delta));
-            updateZoom();
+            if (event.ctrlKey || event.metaKey) {
+                event.preventDefault();
+                const delta = event.deltaY > 0 ? -10 : 10;
+                currentZoom = Math.min(1000, Math.max(10, currentZoom + delta));
+                updateZoom();
+            }
         });
 
         preview.addEventListener('pointerdown', (event) => {
             if (event.target.tagName === 'BUTTON') return;
             event.preventDefault();
-            isDragging = true;
-            preview.style.cursor = 'grabbing';
-            startX = event.clientX;
-            startY = event.clientY;
-            startScrollLeft = preview.scrollLeft;
-            startScrollTop = preview.scrollTop;
+            
+            if (isMeasuring) {
+                measureActive = true;
+                const rect = preview.getBoundingClientRect();
+                measureStartX = event.clientX - rect.left + preview.scrollLeft - 20;
+                measureStartY = event.clientY - rect.top + preview.scrollTop - 20;
+                
+                measureLine.setAttribute('x1', measureStartX);
+                measureLine.setAttribute('y1', measureStartY);
+                measureLine.setAttribute('x2', measureStartX);
+                measureLine.setAttribute('y2', measureStartY);
+                measureLine.style.display = 'block';
+            } else {
+                isDragging = true;
+                preview.style.cursor = 'grabbing';
+                startX = event.clientX;
+                startY = event.clientY;
+                startScrollLeft = preview.scrollLeft;
+                startScrollTop = preview.scrollTop;
+            }
             preview.setPointerCapture(event.pointerId);
         });
 
         preview.addEventListener('pointermove', (event) => {
-            if (!isDragging) return;
-            const dx = event.clientX - startX;
-            const dy = event.clientY - startY;
-            preview.scrollLeft = startScrollLeft - dx;
-            preview.scrollTop = startScrollTop - dy;
-            saveState();
+            if (isMeasuring && measureActive) {
+                const rect = preview.getBoundingClientRect();
+                const currentX = event.clientX - rect.left + preview.scrollLeft - 20;
+                const currentY = event.clientY - rect.top + preview.scrollTop - 20;
+                
+                measureLine.setAttribute('x2', currentX);
+                measureLine.setAttribute('y2', currentY);
+                
+                const dx = currentX - measureStartX;
+                const dy = currentY - measureStartY;
+                const distPixels = Math.sqrt(dx*dx + dy*dy);
+                
+                // 3.7795275591 px/mm in original SVG.
+                // Scale factor: previewImg.clientWidth / previewImg.naturalWidth
+                const scale = previewImg.clientWidth / previewImg.naturalWidth;
+                const distMm = (distPixels / scale) / 3.7795275591;
+                
+                measureLabel.textContent = distMm.toFixed(2) + ' mm';
+            } else if (isDragging) {
+                const dx = event.clientX - startX;
+                const dy = event.clientY - startY;
+                preview.scrollLeft = startScrollLeft - dx;
+                preview.scrollTop = startScrollTop - dy;
+                saveState();
+            }
         });
 
         preview.addEventListener('pointerup', (event) => {
-            if (!isDragging) return;
-            isDragging = false;
-            preview.style.cursor = 'grab';
+            if (isMeasuring && measureActive) {
+                measureActive = false;
+            } else if (isDragging) {
+                isDragging = false;
+                if (!isMeasuring) preview.style.cursor = 'grab';
+            }
             preview.releasePointerCapture(event.pointerId);
         });
 
         preview.addEventListener('pointerleave', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            preview.style.cursor = 'grab';
+            if (isMeasuring && measureActive) {
+                measureActive = false;
+            } else if (isDragging) {
+                isDragging = false;
+                if (!isMeasuring) preview.style.cursor = 'grab';
+            }
         });
     </script>
     """
@@ -218,3 +290,25 @@ with col2:
         file_name="tessellation.svg",
         mime="image/svg+xml"
     )
+    
+    st.markdown("---")
+    st.markdown("### Tessellation Position")
+    st.button("Normal (No modifications)", key="tess_pos_9", use_container_width=True, help="No tessellation modifications", on_click=set_tess_pos, args=(9,))
+    st.markdown("Select where this pattern is in a 3×3 grid:")
+    positions = [
+        (0, "Top-Left"), (1, "Top-Center"), (2, "Top-Right"),
+        (3, "Middle-Left"), (4, "Center"), (5, "Middle-Right"),
+        (6, "Bottom-Left"), (7, "Bottom-Center"), (8, "Bottom-Right"),
+        (9, "Normal"),
+    ]
+    cols_small = st.columns(3)
+    for idx, (pos_idx, pos_name) in enumerate(positions[:9]):
+        col_idx = idx % 3
+        with cols_small[col_idx]:
+            short_name = pos_name.replace("Top-", "T-").replace("Bottom-", "B-").replace("Middle-", "M-").replace("Center", "C").replace("-C", "C").replace("-Left", "L").replace("-Right", "R")
+            st.button(short_name, key="tess_pos_" + str(pos_idx), use_container_width=True, help=pos_name, on_click=set_tess_pos, args=(pos_idx,))
+    current_pos = st.session_state.get("tessellation_position", 9)
+    st.write("Current:", dict(positions).get(current_pos, "Unknown"))
+
+    st.markdown("### Tessellation Adjustments")
+    st.slider("Tolerance (mm)", min_value=-10.0, max_value=10.0, value=0.0, step=0.1, key="tess_tol", help="Positive = smaller shape (cut inward). Negative = bigger shape (cut outward).")
