@@ -2,11 +2,13 @@ import svgwrite
 import math
 
 class VariableGeometryGenerator:
-    def __init__(self, cols, rows, cell_size, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0):
+    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0):
         self.scale = 3.7795275591  # 96 DPI scale for LightBurn (1mm = 3.7795px)
         self.cols = cols
         self.rows = rows
-        self.cell_size = cell_size
+        self.start_cell_size = start_cell_size
+        self.end_cell_size_x = end_cell_size_x
+        self.end_cell_size_y = end_cell_size_y
         self.normal_gap_x = normal_gap_x
         self.normal_gap_y = normal_gap_y
         self.alt_gap_x = alt_gap_x
@@ -15,8 +17,23 @@ class VariableGeometryGenerator:
         self.tessellation_position = tessellation_position  # 0-8 for 3x3 grid (default 4 = center)
         self.tess_tolerance = tessellation_tolerance
         
-        self.canvas_width = cols * cell_size
-        self.canvas_height = rows * cell_size
+        self.cell_widths = [self._calc_cell_size_x(c) for c in range(cols)]
+        self.cell_heights = [self._calc_cell_size_y(r) for r in range(rows)]
+        
+        self.cell_x = [0.0] * cols
+        curr_x = 0.0
+        for c in range(cols):
+            self.cell_x[c] = curr_x
+            curr_x += self.cell_widths[c]
+        self.canvas_width = curr_x
+
+        self.cell_y = [0.0] * rows
+        curr_y = 0.0
+        for r in range(rows):
+            self.cell_y[r] = curr_y
+            curr_y += self.cell_heights[r]
+        self.canvas_height = curr_y
+
         self.stroke_style = {'stroke': 'black', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
         self.red_stroke_style = {'stroke': 'red', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
         self.green_stroke_style = {'stroke': 'blue', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
@@ -26,6 +43,15 @@ class VariableGeometryGenerator:
         self.offset_x = 0
         self.offset_y = 0
         self.current_dwg = None
+
+    def _calc_cell_size_x(self, col):
+        if self.cols <= 1: return self.start_cell_size
+        return self.start_cell_size + (self.end_cell_size_x - self.start_cell_size) * (col / (self.cols - 1))
+
+    def _calc_cell_size_y(self, row):
+        if self.rows <= 1: return self.start_cell_size
+        progress = (self.rows - 1 - row) / (self.rows - 1)  # Bottom row is 0.0, Top row is 1.0
+        return self.start_cell_size + (self.end_cell_size_y - self.start_cell_size) * progress
 
 
     def _should_split_top_edge(self):
@@ -46,10 +72,10 @@ class VariableGeometryGenerator:
 
     @property
     def clip_box(self):
-        min_x = (0.5 * self.cell_size) + self.tess_tolerance if self._should_split_left_edge() else 0.0
-        max_x = self.cols * self.cell_size - (0.5 * self.cell_size) - self.tess_tolerance if self._should_split_right_edge() else self.cols * self.cell_size
-        min_y = (0.5 * self.cell_size) + self.tess_tolerance if self._should_split_top_edge() else 0.0
-        max_y = self.rows * self.cell_size - (0.5 * self.cell_size) - self.tess_tolerance if self._should_split_bottom_edge() else self.rows * self.cell_size
+        min_x = (0.5 * self.cell_widths[0]) + self.tess_tolerance if self._should_split_left_edge() else 0.0
+        max_x = self.canvas_width - (0.5 * self.cell_widths[-1]) - self.tess_tolerance if self._should_split_right_edge() else self.canvas_width
+        min_y = (0.5 * self.cell_heights[0]) + self.tess_tolerance if self._should_split_top_edge() else 0.0
+        max_y = self.canvas_height - (0.5 * self.cell_heights[-1]) - self.tess_tolerance if self._should_split_bottom_edge() else self.canvas_height
         return (min_x, min_y, max_x, max_y)
 
     def _clip_line(self, p1, p2):
@@ -329,8 +355,10 @@ class VariableTabbedGrid(VariableGeometryGenerator):
     def _draw_grid_layer(self, is_inverted, style):
         for row in range(self.rows):
             for col in range(self.cols):
-                x = col * self.cell_size
-                y = row * self.cell_size
+                x = self.cell_x[col]
+                y = self.cell_y[row]
+                cell_w = self.cell_widths[col]
+                cell_h = self.cell_heights[row]
                 
                 mx, my = self.get_margins(row, col, is_inverted)
 
@@ -339,28 +367,28 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     if is_inverted: is_large_square = not is_large_square
 
                     if is_large_square:
-                        self.draw_rectangle(x, y, self.cell_size, self.cell_size, True, row, col, style)
+                        self.draw_rectangle(x, y, cell_w, cell_h, True, row, col, style)
                     else:
-                        w = self.cell_size - (2 * mx)
-                        h = self.cell_size - (2 * my)
+                        w = cell_w - (2 * mx)
+                        h = cell_h - (2 * my)
                         self.draw_rectangle(x + mx, y + my, w, h, False, row, col, style)
 
                 elif row % 2 == 0 and col % 2 != 0:
                     m_left_x, m_left_y = self.get_margins(row, col - 1, is_inverted)
                     m_right_x, m_right_y = self.get_margins(row, col + 1, is_inverted)
-                    y1_L, y2_L = y + m_left_y, y + self.cell_size - m_left_y
-                    y1_R, y2_R = y + m_right_y, y + self.cell_size - m_right_y
+                    y1_L, y2_L = y + m_left_y, y + cell_h - m_left_y
+                    y1_R, y2_R = y + m_right_y, y + cell_h - m_right_y
 
                     left_is_large = (row // 2 + (col - 1) // 2) % 2 == 0
                     if is_inverted: left_is_large = not left_is_large
 
                     if left_is_large:
-                        end_x = x + self.cell_size - m_right_x
+                        end_x = x + cell_w - m_right_x
                         self.draw_solid_line((x, y1_L), (end_x, y1_R), style)
                         self.draw_solid_line((end_x, y1_R), (end_x, y2_R), style)
                         self.draw_solid_line((end_x, y2_R), (x, y2_L), style)
                     else:
-                        start_x, end_x = x + m_left_x, x + self.cell_size
+                        start_x, end_x = x + m_left_x, x + cell_w
                         self.draw_solid_line((start_x, y1_L), (end_x, y1_R), style)
                         self.draw_solid_line((start_x, y1_L), (start_x, y2_L), style)
                         self.draw_solid_line((start_x, y2_L), (end_x, y2_R), style)
@@ -368,19 +396,19 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                 elif row % 2 != 0 and col % 2 == 0:
                     m_top_x, m_top_y = self.get_margins(row - 1, col, is_inverted)
                     m_bottom_x, m_bottom_y = self.get_margins(row + 1, col, is_inverted)
-                    x1_T, x2_T = x + m_top_x, x + self.cell_size - m_top_x
-                    x1_B, x2_B = x + m_bottom_x, x + self.cell_size - m_bottom_x
+                    x1_T, x2_T = x + m_top_x, x + cell_w - m_top_x
+                    x1_B, x2_B = x + m_bottom_x, x + cell_w - m_bottom_x
 
                     top_is_large = ((row - 1) // 2 + col // 2) % 2 == 0
                     if is_inverted: top_is_large = not top_is_large
 
                     if top_is_large:
-                        end_y = y + self.cell_size - m_bottom_y
+                        end_y = y + cell_h - m_bottom_y
                         self.draw_solid_line((x1_T, y), (x1_B, end_y), style)
                         self.draw_solid_line((x2_T, y), (x2_B, end_y), style)
                         self.draw_solid_line((x1_B, end_y), (x2_B, end_y), style)
                     else:
-                        start_y, end_y = y + m_top_y, y + self.cell_size
+                        start_y, end_y = y + m_top_y, y + cell_h
                         self.draw_solid_line((x1_T, start_y), (x1_B, end_y), style)
                         self.draw_solid_line((x2_T, start_y), (x2_B, end_y), style)
                         self.draw_solid_line((x1_T, start_y), (x2_T, start_y), style)
@@ -391,6 +419,9 @@ class VariableTabbedGrid(VariableGeometryGenerator):
     def _draw_x_tabs(self, x, y, row, col, is_inverted, style):
         d_center_x = self.normal_gap_x
         d_center_y = self.normal_gap_y
+        
+        cell_w = self.cell_widths[col]
+        cell_h = self.cell_heights[row]
 
         is_tl_large = ((row - 1) // 2 + (col - 1) // 2) % 2 == 0
         is_tr_large = ((row - 1) // 2 + (col + 1) // 2) % 2 == 0
@@ -411,17 +442,17 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         tl_x = x if is_tl_large else x - m_tl_x
         tl_y = y if is_tl_large else y - m_tl_y
 
-        tr_x = x + self.cell_size if is_tr_large else x + self.cell_size + m_tr_x
+        tr_x = x + cell_w if is_tr_large else x + cell_w + m_tr_x
         tr_y = y if is_tr_large else y - m_tr_y
 
         bl_x = x if is_bl_large else x - m_bl_x
-        bl_y = y + self.cell_size if is_bl_large else y + self.cell_size + m_bl_y
+        bl_y = y + cell_h if is_bl_large else y + cell_h + m_bl_y
 
-        br_x = x + self.cell_size if is_br_large else x + self.cell_size + m_br_x
-        br_y = y + self.cell_size if is_br_large else y + self.cell_size + m_br_y
+        br_x = x + cell_w if is_br_large else x + cell_w + m_br_x
+        br_y = y + cell_h if is_br_large else y + cell_h + m_br_y
 
-        cx = x + self.cell_size / 2
-        cy = y + self.cell_size / 2
+        cx = x + cell_w / 2
+        cy = y + cell_h / 2
 
         self.draw_solid_line((tl_x, tl_y - m_tl_y), (cx, cy - d_center_y), style, apply_clip=False)
         self.draw_solid_line((cx + d_center_x, cy), (br_x + m_br_x, br_y), style, apply_clip=False)
@@ -437,12 +468,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         # Top boundary
         row, y = 0, 0
         for col in range(self.cols - 1):
-            x, next_x = col * self.cell_size, (col + 1) * self.cell_size
+            x = self.cell_x[col]
+            cell_w = self.cell_widths[col]
+            next_x = self.cell_x[col + 1] if col + 1 < self.cols else self.canvas_width
+            
             if col % 2 == 0:
                 is_large = (row // 2 + col // 2) % 2 == 0
                 if is_inverted: is_large = not is_large
                 mx, my = self.get_margins(row, col, is_inverted)
-                TR = (x + self.cell_size, y) if is_large else (x + self.cell_size - mx, y + my)
+                TR = (x + cell_w, y) if is_large else (x + cell_w - mx, y + my)
                 
                 left_is_large = is_large
                 TL_next = (next_x, y + my) if left_is_large else (next_x + mx, y + my)
@@ -451,7 +485,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                 mx, my = self.get_margins(row, col + 1, is_inverted)
                 right_is_large = (row // 2 + (col + 1) // 2) % 2 == 0
                 if is_inverted: right_is_large = not right_is_large
-                TR = (x + self.cell_size, y + my) if right_is_large else (x + self.cell_size - mx, y + my)
+                TR = (x + cell_w, y + my) if right_is_large else (x + cell_w - mx, y + my)
                 
                 is_large_next = right_is_large
                 TL_next = (next_x, y) if is_large_next else (next_x + mx, y + my)
@@ -459,14 +493,17 @@ class VariableTabbedGrid(VariableGeometryGenerator):
 
         # Bottom boundary
         row = self.rows - 1
-        y_bottom = row * self.cell_size + self.cell_size
+        y_bottom = self.canvas_height
         for col in range(self.cols - 1):
-            x, next_x = col * self.cell_size, (col + 1) * self.cell_size
+            x = self.cell_x[col]
+            cell_w = self.cell_widths[col]
+            next_x = self.cell_x[col + 1] if col + 1 < self.cols else self.canvas_width
+            
             if col % 2 == 0:
                 is_large = (row // 2 + col // 2) % 2 == 0
                 if is_inverted: is_large = not is_large
                 mx, my = self.get_margins(row, col, is_inverted)
-                BR = (x + self.cell_size, y_bottom) if is_large else (x + self.cell_size - mx, y_bottom - my)
+                BR = (x + cell_w, y_bottom) if is_large else (x + cell_w - mx, y_bottom - my)
                 
                 left_is_large = is_large
                 BL_next = (next_x, y_bottom - my) if left_is_large else (next_x + mx, y_bottom - my)
@@ -475,7 +512,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                 mx, my = self.get_margins(row, col + 1, is_inverted)
                 right_is_large = (row // 2 + (col + 1) // 2) % 2 == 0
                 if is_inverted: right_is_large = not right_is_large
-                BR = (x + self.cell_size, y_bottom - my) if right_is_large else (x + self.cell_size - mx, y_bottom - my)
+                BR = (x + cell_w, y_bottom - my) if right_is_large else (x + cell_w - mx, y_bottom - my)
                 
                 is_large_next = right_is_large
                 BL_next = (next_x, y_bottom) if is_large_next else (next_x + mx, y_bottom - my)
@@ -484,12 +521,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         # Left boundary
         col, x = 0, 0
         for row in range(self.rows - 1):
-            y, next_y = row * self.cell_size, (row + 1) * self.cell_size
+            y = self.cell_y[row]
+            cell_h = self.cell_heights[row]
+            next_y = self.cell_y[row + 1] if row + 1 < self.rows else self.canvas_height
+            
             if row % 2 == 0:
                 is_large = (row // 2 + col // 2) % 2 == 0
                 if is_inverted: is_large = not is_large
                 mx, my = self.get_margins(row, col, is_inverted)
-                BL = (x, y + self.cell_size) if is_large else (x + mx, y + self.cell_size - my)
+                BL = (x, y + cell_h) if is_large else (x + mx, y + cell_h - my)
                 
                 top_is_large = is_large
                 TL_next = (x + mx, next_y) if top_is_large else (x + mx, next_y + my)
@@ -498,7 +538,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                 mx, my = self.get_margins(row + 1, col, is_inverted)
                 bottom_is_large = ((row + 1) // 2 + col // 2) % 2 == 0
                 if is_inverted: bottom_is_large = not bottom_is_large
-                BL = (x + mx, y + self.cell_size) if bottom_is_large else (x + mx, y + self.cell_size - my)
+                BL = (x + mx, y + cell_h) if bottom_is_large else (x + mx, y + cell_h - my)
                 
                 is_large_next = bottom_is_large
                 TL_next = (x, next_y) if is_large_next else (x + mx, next_y + my)
@@ -506,14 +546,17 @@ class VariableTabbedGrid(VariableGeometryGenerator):
 
         # Right boundary
         col = self.cols - 1
-        x_right = col * self.cell_size + self.cell_size
+        x_right = self.canvas_width
         for row in range(self.rows - 1):
-            y, next_y = row * self.cell_size, (row + 1) * self.cell_size
+            y = self.cell_y[row]
+            cell_h = self.cell_heights[row]
+            next_y = self.cell_y[row + 1] if row + 1 < self.rows else self.canvas_height
+            
             if row % 2 == 0:
                 is_large = (row // 2 + col // 2) % 2 == 0
                 if is_inverted: is_large = not is_large
                 mx, my = self.get_margins(row, col, is_inverted)
-                BR = (x_right, y + self.cell_size) if is_large else (x_right - mx, y + self.cell_size - my)
+                BR = (x_right, y + cell_h) if is_large else (x_right - mx, y + cell_h - my)
                 
                 top_is_large = is_large
                 TR_next = (x_right - mx, next_y) if top_is_large else (x_right - mx, next_y + my)
@@ -522,7 +565,7 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                 mx, my = self.get_margins(row + 1, col, is_inverted)
                 bottom_is_large = ((row + 1) // 2 + col // 2) % 2 == 0
                 if is_inverted: bottom_is_large = not bottom_is_large
-                BR = (x_right - mx, y + self.cell_size) if bottom_is_large else (x_right - mx, y + self.cell_size - my)
+                BR = (x_right - mx, y + cell_h) if bottom_is_large else (x_right - mx, y + cell_h - my)
                 
                 is_large_next = bottom_is_large
                 TR_next = (x_right, next_y) if is_large_next else (x_right - mx, next_y + my)
@@ -554,12 +597,12 @@ class VariableTabbedGrid(VariableGeometryGenerator):
             
             if shrink_top_row and abs(py - self.normal_gap_y) < eps:
                 py = min_y
-            elif shrink_bottom_row and abs(py - (self.rows * self.cell_size - self.normal_gap_y)) < eps:
+            elif shrink_bottom_row and abs(py - (self.canvas_height - self.normal_gap_y)) < eps:
                 py = max_y
 
             if shrink_left_col and abs(px - self.normal_gap_x) < eps:
                 px = min_x
-            elif shrink_right_col and abs(px - (self.cols * self.cell_size - self.normal_gap_x)) < eps:
+            elif shrink_right_col and abs(px - (self.canvas_width - self.normal_gap_x)) < eps:
                 px = max_x
 
             return (px, py)
@@ -567,57 +610,61 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         # Top
         row, y = 0, 0
         for col in range(self.cols):
-            x = col * self.cell_size
+            x = self.cell_x[col]
+            cell_w = self.cell_widths[col]
             if col % 2 == 0:
                 mx, my = self.get_margins(row, col, is_red_layer=is_red_layer)
-                points.extend([(x + mx, y + my), (x + self.cell_size - mx, y + my)])
+                points.extend([(x + mx, y + my), (x + cell_w - mx, y + my)])
             else:
                 m_left_x, m_left_y = self.get_margins(row, col - 1, is_red_layer=is_red_layer)
                 m_right_x, m_right_y = self.get_margins(row, col + 1, is_red_layer=is_red_layer)
-                points.extend([(x + m_left_x, y + m_left_y), (x + self.cell_size - m_right_x, y + m_right_y)])
+                points.extend([(x + m_left_x, y + m_left_y), (x + cell_w - m_right_x, y + m_right_y)])
 
         # Right
         col = self.cols - 1
-        x_right = col * self.cell_size + self.cell_size
+        x_right = self.canvas_width
         for row in range(self.rows):
-            y = row * self.cell_size
+            y = self.cell_y[row]
+            cell_h = self.cell_heights[row]
             if row % 2 == 0:
                 mx, my = self.get_margins(row, col, is_red_layer=is_red_layer)
-                points.extend([(x_right - mx, y + my), (x_right - mx, y + self.cell_size - my)])
+                points.extend([(x_right - mx, y + my), (x_right - mx, y + cell_h - my)])
             else:
                 m_top_x, m_top_y = self.get_margins(row - 1, col, is_red_layer=is_red_layer)
                 m_bottom_x, m_bottom_y = self.get_margins(row + 1, col, is_red_layer=is_red_layer)
-                points.extend([(x_right - m_top_x, y + m_top_y), (x_right - m_bottom_x, y + self.cell_size - m_bottom_y)])
+                points.extend([(x_right - m_top_x, y + m_top_y), (x_right - m_bottom_x, y + cell_h - m_bottom_y)])
 
         # Bottom
         row = self.rows - 1
-        y_bottom = row * self.cell_size + self.cell_size
+        y_bottom = self.canvas_height
         for col in range(self.cols - 1, -1, -1):
-            x = col * self.cell_size
+            x = self.cell_x[col]
+            cell_w = self.cell_widths[col]
             if col % 2 == 0:
                 mx, my = self.get_margins(row, col, is_red_layer=is_red_layer)
-                points.extend([(x + self.cell_size - mx, y_bottom - my), (x + mx, y_bottom - my)])
+                points.extend([(x + cell_w - mx, y_bottom - my), (x + mx, y_bottom - my)])
             else:
                 m_left_x, m_left_y = self.get_margins(row, col - 1, is_red_layer=is_red_layer)
                 m_right_x, m_right_y = self.get_margins(row, col + 1, is_red_layer=is_red_layer)
-                points.extend([(x + self.cell_size - m_right_x, y_bottom - m_right_y), (x + m_left_x, y_bottom - m_left_y)])
+                points.extend([(x + cell_w - m_right_x, y_bottom - m_right_y), (x + m_left_x, y_bottom - m_left_y)])
 
         # Left
         col, x = 0, 0
         for row in range(self.rows - 1, -1, -1):
-            y = row * self.cell_size
+            y = self.cell_y[row]
+            cell_h = self.cell_heights[row]
             if row % 2 == 0:
                 mx, my = self.get_margins(row, col, is_red_layer=is_red_layer)
-                points.extend([(x + mx, y + self.cell_size - my), (x + mx, y + my)])
+                points.extend([(x + mx, y + cell_h - my), (x + mx, y + my)])
             else:
                 m_top_x, m_top_y = self.get_margins(row - 1, col, is_red_layer=is_red_layer)
                 m_bottom_x, m_bottom_y = self.get_margins(row + 1, col, is_red_layer=is_red_layer)
-                points.extend([(x + m_bottom_x, y + self.cell_size - m_bottom_y), (x + m_top_x, y + m_top_y)])
+                points.extend([(x + m_bottom_x, y + cell_h - m_bottom_y), (x + m_top_x, y + m_top_y)])
 
         for row in range(self.rows):
             for col in range(self.cols):
                 if row % 2 != 0 and col % 2 != 0:
-                    self._draw_red_cutout(col * self.cell_size, row * self.cell_size, row, col, is_red_layer)
+                    self._draw_red_cutout(self.cell_x[col], self.cell_y[row], row, col, is_red_layer)
 
         if shrink_top_row or shrink_bottom_row or shrink_left_col or shrink_right_col:
             shrunk_points = [_maybe_shrink_point(point) for point in points]
@@ -637,6 +684,9 @@ class VariableTabbedGrid(VariableGeometryGenerator):
             self.draw_solid_line((max_x, min_y), (max_x, max_y), self.blue_dashed_style, apply_clip=False)
 
     def _draw_red_cutout(self, x, y, row, col, is_red_layer):
+        cell_w = self.cell_widths[col]
+        cell_h = self.cell_heights[row]
+        
         is_tl_large = ((row - 1) // 2 + (col - 1) // 2) % 2 == 0
         is_tr_large = ((row - 1) // 2 + (col + 1) // 2) % 2 == 0
         is_bl_large = ((row + 1) // 2 + (col - 1) // 2) % 2 == 0
@@ -648,16 +698,16 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         m_br_x, m_br_y = self.get_margins(row + 1, col + 1, is_red_layer=is_red_layer)
 
         P_T1 = (x, y - m_tl_y) if is_tl_large else (x + m_tl_x, y - m_tl_y)
-        P_T2 = (x + self.cell_size - m_tr_x, y - m_tr_y) if is_tr_large else (x + self.cell_size, y - m_tr_y)
+        P_T2 = (x + cell_w - m_tr_x, y - m_tr_y) if is_tr_large else (x + cell_w, y - m_tr_y)
         
-        P_B1 = (x, y + self.cell_size + m_bl_y) if is_bl_large else (x + m_bl_x, y + self.cell_size + m_bl_y)
-        P_B2 = (x + self.cell_size - m_br_x, y + self.cell_size + m_br_y) if is_br_large else (x + self.cell_size, y + self.cell_size + m_br_y)
+        P_B1 = (x, y + cell_h + m_bl_y) if is_bl_large else (x + m_bl_x, y + cell_h + m_bl_y)
+        P_B2 = (x + cell_w - m_br_x, y + cell_h + m_br_y) if is_br_large else (x + cell_w, y + cell_h + m_br_y)
         
         P_L1 = (x - m_tl_x, y) if is_tl_large else (x - m_tl_x, y + m_tl_y)
-        P_L2 = (x - m_bl_x, y + self.cell_size - m_bl_y) if is_bl_large else (x - m_bl_x, y + self.cell_size)
+        P_L2 = (x - m_bl_x, y + cell_h - m_bl_y) if is_bl_large else (x - m_bl_x, y + cell_h)
         
-        P_R1 = (x + self.cell_size + m_tr_x, y) if is_tr_large else (x + self.cell_size + m_tr_x, y + m_tr_y)
-        P_R2 = (x + self.cell_size + m_br_x, y + self.cell_size - m_br_y) if is_br_large else (x + self.cell_size + m_br_x, y + self.cell_size)
+        P_R1 = (x + cell_w + m_tr_x, y) if is_tr_large else (x + cell_w + m_tr_x, y + m_tr_y)
+        P_R2 = (x + cell_w + m_br_x, y + cell_h - m_br_y) if is_br_large else (x + cell_w + m_br_x, y + cell_h)
 
         v_tl = self._line_intersection(P_T1, P_T2, P_L1, P_L2)
         v_tr = self._line_intersection(P_T1, P_T2, P_R1, P_R2)

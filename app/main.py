@@ -1,5 +1,8 @@
 import streamlit as st
 import base64
+import importlib
+import geometry
+importlib.reload(geometry)
 from geometry import VariableTabbedGrid
 
 def set_tess_pos(pos):
@@ -46,13 +49,24 @@ align_y = st.sidebar.number_input("Y Offset (mm)", value=5.0, step=1.0)
 st.sidebar.subheader("Grid Dimensions")
 cols = st.sidebar.number_input("Columns", min_value=1, max_value=50, value=15)
 rows = st.sidebar.number_input("Rows", min_value=1, max_value=50, value=11)
-cell_size = st.sidebar.number_input("Cell Size (mm)", min_value=1.0, max_value=100.0, value=15.0)
+
+st.sidebar.subheader("Cell Dimensions (Gradient)")
+start_cell_size = st.sidebar.number_input("Start Cell Size (Bottom-Left) (mm)", min_value=1.0, max_value=100.0, value=15.0)
+end_cell_size_x = st.sidebar.number_input("End Cell Size X (Bottom-Right) (mm)", min_value=1.0, max_value=100.0, value=25.0)
+end_cell_size_y = st.sidebar.number_input("End Cell Size Y (Top-Left) (mm)", min_value=1.0, max_value=100.0, value=25.0)
+
+if end_cell_size_x != end_cell_size_y:
+    st.sidebar.info("Note: To keep all grid cells as perfect squares, the X and Y end sizes must be identical. Different X and Y gradients will cause off-diagonal cells to stretch into rectangles to keep the grid connected.")
+
+max_w = max(start_cell_size, end_cell_size_x)
+max_h = max(start_cell_size, end_cell_size_y)
 
 st.sidebar.subheader("Margins & Tabs")
-normal_gap_x = st.sidebar.slider("Total Normal Gap X (mm)", 0.0, float(cell_size), 3.0, 0.1)
-normal_gap_y = st.sidebar.slider("Total Normal Gap Y (mm)", 0.0, float(cell_size), 3.0, 0.1)
-alt_gap_x = st.sidebar.slider("Total Alternate Gap X (mm)", 0.0, float(cell_size), 1.0, 0.1)
-alt_gap_y = st.sidebar.slider("Total Alternate Gap Y (mm)", 0.0, float(cell_size), 1.0, 0.1)
+normal_gap_x = st.sidebar.slider("Total Normal Gap X (mm)", 0.0, float(max_w), 3.0, 0.1)
+normal_gap_y = st.sidebar.slider("Total Normal Gap Y (mm)", 0.0, float(max_h), 3.0, 0.1)
+alt_gap_x = st.sidebar.slider("Total Alternate Gap X (mm)", 0.0, float(max_w), 1.0, 0.1)
+alt_gap_y = st.sidebar.slider("Total Alternate Gap Y (mm)", 0.0, float(max_h), 1.0, 0.1)
+
 bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.5, 0.1)
 
 # Keep tessellation selection state
@@ -60,7 +74,7 @@ tessellation_position = st.session_state.get("tessellation_position", 9)  # Defa
 tessellation_tolerance = st.session_state.get("tess_tol", 0.0)
 
 # Create a signature for current settings to detect changes
-current_settings = (cols, rows, cell_size, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance)
+current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance)
 
 if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
     st.session_state.last_settings = current_settings
@@ -68,7 +82,9 @@ if 'last_settings' not in st.session_state or st.session_state.last_settings != 
 generator = VariableTabbedGrid(
     cols=int(cols), 
     rows=int(rows), 
-    cell_size=float(cell_size), 
+    start_cell_size=float(start_cell_size), 
+    end_cell_size_x=float(end_cell_size_x), 
+    end_cell_size_y=float(end_cell_size_y), 
     normal_gap_x=float(normal_gap_x) / 2.0, 
     normal_gap_y=float(normal_gap_y) / 2.0, 
     alt_gap_x=float(alt_gap_x) / 2.0, 
