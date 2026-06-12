@@ -49,8 +49,10 @@ rows = st.sidebar.number_input("Rows", min_value=1, max_value=50, value=11)
 cell_size = st.sidebar.number_input("Cell Size (mm)", min_value=1.0, max_value=100.0, value=15.0)
 
 st.sidebar.subheader("Margins & Tabs")
-normal_gap = st.sidebar.slider("Total Normal Gap (mm)", 0.0, float(cell_size), 3.0, 0.1)
-alt_gap = st.sidebar.slider("Total Alternate Gap (mm)", 0.0, float(cell_size), 1.0, 0.1)
+normal_gap_x = st.sidebar.slider("Total Normal Gap X (mm)", 0.0, float(cell_size), 3.0, 0.1)
+normal_gap_y = st.sidebar.slider("Total Normal Gap Y (mm)", 0.0, float(cell_size), 3.0, 0.1)
+alt_gap_x = st.sidebar.slider("Total Alternate Gap X (mm)", 0.0, float(cell_size), 1.0, 0.1)
+alt_gap_y = st.sidebar.slider("Total Alternate Gap Y (mm)", 0.0, float(cell_size), 1.0, 0.1)
 bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.5, 0.1)
 
 # Keep tessellation selection state
@@ -58,7 +60,7 @@ tessellation_position = st.session_state.get("tessellation_position", 9)  # Defa
 tessellation_tolerance = st.session_state.get("tess_tol", 0.0)
 
 # Create a signature for current settings to detect changes
-current_settings = (cols, rows, cell_size, normal_gap, alt_gap, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance)
+current_settings = (cols, rows, cell_size, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance)
 
 if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
     st.session_state.last_settings = current_settings
@@ -67,8 +69,10 @@ generator = VariableTabbedGrid(
     cols=int(cols), 
     rows=int(rows), 
     cell_size=float(cell_size), 
-    normal_gap=float(normal_gap) / 2.0, 
-    alt_gap=float(alt_gap) / 2.0, 
+    normal_gap_x=float(normal_gap_x) / 2.0, 
+    normal_gap_y=float(normal_gap_y) / 2.0, 
+    alt_gap_x=float(alt_gap_x) / 2.0, 
+    alt_gap_y=float(alt_gap_y) / 2.0, 
     bridge_size=float(bridge_size),
     tessellation_position=tessellation_position,
     tessellation_tolerance=tessellation_tolerance

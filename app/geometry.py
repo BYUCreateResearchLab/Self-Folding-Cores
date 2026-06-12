@@ -2,13 +2,15 @@ import svgwrite
 import math
 
 class VariableGeometryGenerator:
-    def __init__(self, cols, rows, cell_size, normal_gap, alt_gap, bridge_size, tessellation_position=4, tessellation_tolerance=0.0):
+    def __init__(self, cols, rows, cell_size, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0):
         self.scale = 3.7795275591  # 96 DPI scale for LightBurn (1mm = 3.7795px)
         self.cols = cols
         self.rows = rows
         self.cell_size = cell_size
-        self.normal_gap = normal_gap
-        self.alt_gap = alt_gap
+        self.normal_gap_x = normal_gap_x
+        self.normal_gap_y = normal_gap_y
+        self.alt_gap_x = alt_gap_x
+        self.alt_gap_y = alt_gap_y
         self.bridge_size = bridge_size
         self.tessellation_position = tessellation_position  # 0-8 for 3x3 grid (default 4 = center)
         self.tess_tolerance = tessellation_tolerance
@@ -103,22 +105,22 @@ class VariableGeometryGenerator:
 
     def get_margins(self, row, col, is_inverted=False, is_red_layer=False):
         if is_red_layer:
-            return self.normal_gap, self.normal_gap
+            return self.normal_gap_x, self.normal_gap_y
         if not is_inverted:
-            return self.normal_gap, self.normal_gap
+            return self.normal_gap_x, self.normal_gap_y
             
         # For x-tabs (odd row and odd col), maintain the normal gap width
         if row % 2 != 0 and col % 2 != 0:
-            return self.normal_gap, self.normal_gap
+            return self.normal_gap_x, self.normal_gap_y
             
         is_large_square = (row // 2 + col // 2) % 2 == 0
         if is_inverted:
             is_large_square = not is_large_square
             
         if not is_large_square:
-            return self.alt_gap, self.normal_gap
+            return self.alt_gap_x, self.alt_gap_y
         else:
-            return self.normal_gap, self.normal_gap
+            return self.normal_gap_x, self.normal_gap_y
 
     def create_drawing(self, show_sheet=False, sheet_w=279, sheet_h=216):
         padding = 50
@@ -387,7 +389,8 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     self._draw_x_tabs(x, y, row, col, is_inverted, style)
 
     def _draw_x_tabs(self, x, y, row, col, is_inverted, style):
-        d_center = self.normal_gap
+        d_center_x = self.normal_gap_x
+        d_center_y = self.normal_gap_y
 
         is_tl_large = ((row - 1) // 2 + (col - 1) // 2) % 2 == 0
         is_tr_large = ((row - 1) // 2 + (col + 1) // 2) % 2 == 0
@@ -420,15 +423,15 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         cx = x + self.cell_size / 2
         cy = y + self.cell_size / 2
 
-        self.draw_solid_line((tl_x, tl_y - m_tl_x), (cx, cy - d_center), style, apply_clip=False)
-        self.draw_solid_line((cx + d_center, cy), (br_x + m_br_x, br_y), style, apply_clip=False)
-        self.draw_solid_line((tl_x - m_tl_x, tl_y), (cx - d_center, cy), style, apply_clip=False)
-        self.draw_solid_line((cx, cy + d_center), (br_x, br_y + m_br_x), style, apply_clip=False)
+        self.draw_solid_line((tl_x, tl_y - m_tl_y), (cx, cy - d_center_y), style, apply_clip=False)
+        self.draw_solid_line((cx + d_center_x, cy), (br_x + m_br_x, br_y), style, apply_clip=False)
+        self.draw_solid_line((tl_x - m_tl_x, tl_y), (cx - d_center_x, cy), style, apply_clip=False)
+        self.draw_solid_line((cx, cy + d_center_y), (br_x, br_y + m_br_y), style, apply_clip=False)
 
-        self.draw_solid_line((bl_x - m_bl_x, bl_y), (cx - d_center, cy), style, apply_clip=False)
-        self.draw_solid_line((cx, cy - d_center), (tr_x, tr_y - m_tr_x), style, apply_clip=False)
-        self.draw_solid_line((bl_x, bl_y + m_bl_x), (cx, cy + d_center), style, apply_clip=False)
-        self.draw_solid_line((cx + d_center, cy), (tr_x + m_tr_x, tr_y), style, apply_clip=False)
+        self.draw_solid_line((bl_x - m_bl_x, bl_y), (cx - d_center_x, cy), style, apply_clip=False)
+        self.draw_solid_line((cx, cy - d_center_y), (tr_x, tr_y - m_tr_y), style, apply_clip=False)
+        self.draw_solid_line((bl_x, bl_y + m_bl_y), (cx, cy + d_center_y), style, apply_clip=False)
+        self.draw_solid_line((cx + d_center_x, cy), (tr_x + m_tr_x, tr_y), style, apply_clip=False)
 
     def _draw_boundary_gaps(self, is_inverted, style):
         # Top boundary
@@ -546,18 +549,17 @@ class VariableTabbedGrid(VariableGeometryGenerator):
 
         def _maybe_shrink_point(point):
             px, py = point
-            ng = self.normal_gap
             eps = 1e-5
             min_x, min_y, max_x, max_y = self.clip_box
             
-            if shrink_top_row and abs(py - ng) < eps:
+            if shrink_top_row and abs(py - self.normal_gap_y) < eps:
                 py = min_y
-            elif shrink_bottom_row and abs(py - (self.rows * self.cell_size - ng)) < eps:
+            elif shrink_bottom_row and abs(py - (self.rows * self.cell_size - self.normal_gap_y)) < eps:
                 py = max_y
 
-            if shrink_left_col and abs(px - ng) < eps:
+            if shrink_left_col and abs(px - self.normal_gap_x) < eps:
                 px = min_x
-            elif shrink_right_col and abs(px - (self.cols * self.cell_size - ng)) < eps:
+            elif shrink_right_col and abs(px - (self.cols * self.cell_size - self.normal_gap_x)) < eps:
                 px = max_x
 
             return (px, py)
