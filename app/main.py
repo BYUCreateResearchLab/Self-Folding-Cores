@@ -62,10 +62,10 @@ max_w = max(start_cell_size, end_cell_size_x)
 max_h = max(start_cell_size, end_cell_size_y)
 
 st.sidebar.subheader("Margins & Tabs")
-normal_gap_x = st.sidebar.slider("Total Normal Gap X (mm)", 0.0, float(max_w), 3.0, 0.1)
-normal_gap_y = st.sidebar.slider("Total Normal Gap Y (mm)", 0.0, float(max_h), 3.0, 0.1)
-alt_gap_x = st.sidebar.slider("Total Alternate Gap X (mm)", 0.0, float(max_w), 1.0, 0.1)
-alt_gap_y = st.sidebar.slider("Total Alternate Gap Y (mm)", 0.0, float(max_h), 1.0, 0.1)
+normal_gap_x = st.sidebar.slider("Bottom Layer Vertical Gap (mm)", 0.0, float(max_w), 3.0, 0.1)
+normal_gap_y = st.sidebar.slider("Bottom Layer Horizontal Gap (mm)", 0.0, float(max_h), 3.0, 0.1)
+alt_gap_x = st.sidebar.slider("Top Layer Vertical Gap (mm)", 0.0, float(max_w), 1.0, 0.1)
+alt_gap_y = st.sidebar.slider("Top Layer Horizontal Gap (mm)", 0.0, float(max_h), 1.0, 0.1)
 
 bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.5, 0.1)
 
