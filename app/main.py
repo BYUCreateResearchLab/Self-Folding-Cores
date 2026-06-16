@@ -11,40 +11,23 @@ def set_tess_pos(pos):
 # Trigger Streamlit to reload to pick up geometry.py changes
 st.set_page_config(layout="wide", page_title="Self-Folding Cores UI")
 
-st.markdown(
-    """
-    <style>
-        body, .stApp, .main, .block-container {
-            background-color: #000000 !important;
-            color: #ffffff !important;
-        }
-        section[data-testid="stSidebar"] {
-            background-color: #000000 !important;
-        }
-        .css-1ynx3rn {
-            background-color: #000000 !important;
-        }
-        .stButton button, .stDownloadButton button {
-            background-color: #111111 !important;
-            color: #ffffff !important;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 st.sidebar.title("Parameters")
 
 st.sidebar.subheader("Visualization")
-show_base = st.sidebar.checkbox("Museum Board Base (Black Layer)", value=True)
-show_top = st.sidebar.checkbox("Museum Board Top (Blue Layer)", value=True)
-show_red = st.sidebar.checkbox("Shrinky Dink / Tape Sheets (Red Layer)", value=True)
-show_grid = st.sidebar.checkbox("Show 10x10mm Grid", value=True)
-show_sheet = st.sidebar.checkbox("8.5\" x 11\" landscape boundary (279mm × 216mm)", value=True)
+if 'show_base' not in st.session_state: st.session_state.show_base = True
+if 'show_top' not in st.session_state: st.session_state.show_top = True
+if 'show_red' not in st.session_state: st.session_state.show_red = True
+if 'show_grid' not in st.session_state: st.session_state.show_grid = True
+if 'show_sheet' not in st.session_state: st.session_state.show_sheet = True
 
-st.sidebar.subheader("Pattern Alignment on Sheet")
-align_x = st.sidebar.number_input("X Offset (mm)", value=5.0, step=1.0)
-align_y = st.sidebar.number_input("Y Offset (mm)", value=5.0, step=1.0)
+show_base = st.sidebar.checkbox("Museum Board Base (Black Layer)", key="show_base")
+show_top = st.sidebar.checkbox("Museum Board Top (Blue Layer)", key="show_top")
+show_red = st.sidebar.checkbox("Shrinky Dink / Tape Sheets (Red Layer)", key="show_red")
+show_grid = st.sidebar.checkbox("Show 10x10mm Grid", key="show_grid")
+show_sheet = st.sidebar.checkbox("8.5\" x 11\" landscape boundary (279mm × 216mm)", key="show_sheet")
+
+align_x = st.session_state.get("align_x", 5.0)
+align_y = st.session_state.get("align_y", 5.0)
 
 st.sidebar.subheader("Grid Dimensions")
 cols = st.sidebar.number_input("Columns", min_value=1, max_value=50, value=15)
@@ -114,11 +97,25 @@ generator = VariableTabbedGrid(
 
 st.title("Tessellation Visualizer")
 
-col1, col2 = st.columns([3, 1])
+col1, col2 = st.columns([5, 1])
 
 with col1:
     st.markdown("### Preview")
-    layout_mode = st.radio("Layer Layout Mode", ["Overlaid", "Side-by-Side", "Stacked Vertically"], horizontal=True)
+    modes = ["Overlaid", "Side-by-Side", "Stacked Vertically"]
+    if 'layout_mode_idx' not in st.session_state:
+        st.session_state.layout_mode_idx = 0
+
+    def cycle_layout_mode():
+        st.session_state.layout_mode_idx = (st.session_state.layout_mode_idx + 1) % len(modes)
+        # Toggle off grid and sheet if not overlaid
+        if st.session_state.layout_mode_idx in [1, 2]:
+            st.session_state.show_grid = False
+            st.session_state.show_sheet = False
+
+    layout_mode = modes[st.session_state.layout_mode_idx]
+    
+    # Put the button back in native Streamlit UI cleanly
+    st.button(f"Layout Mode: {layout_mode}", on_click=cycle_layout_mode)
     
     # Create a signature for current settings to detect changes (including layout_mode)
     current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, layout_mode)
@@ -154,15 +151,46 @@ with col1:
     
     # CSS wrapper for panning and zooming the SVG, with drag support and zoom controls
     html = """
-    <div style="font-family: 'Source Sans Pro', sans-serif; display: flex; gap: 8px; margin-bottom: 10px; align-items: center;">
-        <button id="zoom-in" style="font-family: inherit; padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom In</button>
-        <button id="zoom-out" style="font-family: inherit; padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom Out</button>
-        <button id="reset-view" style="font-family: inherit; padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Reset View</button>
-        <button id="measure-btn" style="font-family: inherit; padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Measure: Off</button>
-        <div id="zoom-label" style="align-self: center; color: #fff; margin-left: 10px;">100%</div>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --border-color: #ccc;
+            --btn-bg: #eee;
+            --btn-border: #ccc;
+            --btn-text: #000;
+            --text-color: #000;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #111;
+                --border-color: #444;
+                --btn-bg: #222;
+                --btn-border: #444;
+                --btn-text: #fff;
+                --text-color: #fff;
+            }
+        }
+        .toolbar { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; color: var(--text-color); font-family: 'Source Sans Pro', sans-serif; }
+        .toolbar button { 
+            font-family: inherit; padding: 8px 14px; border: 1px solid var(--btn-border); 
+            border-radius: 4px; background: var(--btn-bg); color: var(--btn-text); cursor: pointer; 
+        }
+        .toolbar button:hover { opacity: 0.8; }
+        #draggable-preview { 
+            position: relative; width: 100%; height: 85vh; overflow: hidden; 
+            background-color: #ffffff; border: 1px solid var(--border-color); 
+            border-radius: 5px; padding: 20px; cursor: grab; 
+        }
+    </style>
+    <div class="toolbar">
+        <button id="zoom-in">Zoom In</button>
+        <button id="zoom-out">Zoom Out</button>
+        <button id="reset-view">Reset View</button>
+        <button id="measure-btn">Measure: Off</button>
+        <div id="zoom-label" style="align-self: center; margin-left: 10px;">100%</div>
         <div id="measure-label" style="align-self: center; color: #00ff00; margin-left: 10px; font-weight: bold;"></div>
     </div>
-    <div id="draggable-preview" style="position: relative; width: 100%; height: 75vh; overflow: hidden; background-color: #ffffff; border: 1px solid #444; border-radius: 5px; padding: 20px; cursor: grab;">
+    <div id="draggable-preview">
         <img id="preview-img" src="data:image/svg+xml;base64,{B64}" style="width: 100%; max-width: none; display: block; pointer-events: none;"/>
         <svg id="measure-overlay" style="position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); height: calc(100% - 40px); pointer-events: none; overflow: visible;">
             <line id="measure-line" x1="0" y1="0" x2="0" y2="0" stroke="#00ff00" stroke-width="2" stroke-dasharray="4,4" display="none" />
@@ -327,8 +355,8 @@ with col1:
         });
     </script>
     """
-    html = html.replace( '{B64}', b64 ).replace( '{ZOOM}', "100" )
-    st.iframe(html, height=820)
+    html = html.replace( '{B64}', b64 ).replace( '{ZOOM}', "100" ).replace('{LAYOUT_MODE}', layout_mode)
+    st.iframe(html, height=1000)
 
 with col2:
     st.markdown("### Export Full SVG")
@@ -339,6 +367,11 @@ with col2:
         mime="image/svg+xml"
     )
     
+    st.markdown("---")
+    st.markdown("### Pattern Alignment on Sheet")
+    st.number_input("X Offset (mm)", value=5.0, step=1.0, key="align_x")
+    st.number_input("Y Offset (mm)", value=5.0, step=1.0, key="align_y")
+
     st.markdown("---")
     st.markdown("### Tessellation Position")
     st.button("Normal (No modifications)", key="tess_pos_9", use_container_width=True, help="No tessellation modifications", on_click=set_tess_pos, args=(9,))
@@ -358,5 +391,5 @@ with col2:
     current_pos = st.session_state.get("tessellation_position", 9)
     st.write("Current:", dict(positions).get(current_pos, "Unknown"))
 
-    st.markdown("### Tessellation Adjustments")
+    st.markdown("#### Tessellation Adjustments")
     st.slider("Tolerance (mm)", min_value=-10.0, max_value=10.0, value=0.0, step=0.1, key="tess_tol", help="Positive = smaller shape (cut inward). Negative = bigger shape (cut outward).")
