@@ -126,11 +126,11 @@ with col1:
     
     # CSS wrapper for panning and zooming the SVG, with drag support and zoom controls
     html = """
-    <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center;">
-        <button id="zoom-in" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom In</button>
-        <button id="zoom-out" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom Out</button>
-        <button id="reset-view" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Reset View</button>
-        <button id="measure-btn" style="padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Measure: Off</button>
+    <div style="font-family: 'Source Sans Pro', sans-serif; display: flex; gap: 8px; margin-bottom: 10px; align-items: center;">
+        <button id="zoom-in" style="font-family: inherit; padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom In</button>
+        <button id="zoom-out" style="font-family: inherit; padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Zoom Out</button>
+        <button id="reset-view" style="font-family: inherit; padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Reset View</button>
+        <button id="measure-btn" style="font-family: inherit; padding: 8px 14px; border: 1px solid #444; border-radius: 4px; background: #111; color: #fff; cursor: pointer;">Measure: Off</button>
         <div id="zoom-label" style="align-self: center; color: #fff; margin-left: 10px;">100%</div>
         <div id="measure-label" style="align-self: center; color: #00ff00; margin-left: 10px; font-weight: bold;"></div>
     </div>
