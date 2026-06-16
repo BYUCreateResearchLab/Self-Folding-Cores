@@ -52,8 +52,8 @@ rows = st.sidebar.number_input("Rows", min_value=1, max_value=50, value=11)
 
 st.sidebar.subheader("Cell Dimensions (Gradient)")
 start_cell_size = st.sidebar.number_input("Start Cell Size (Bottom-Left) (mm)", min_value=1.0, max_value=100.0, value=15.0)
-end_cell_size_x = st.sidebar.number_input("End Cell Size X (Bottom-Right) (mm)", min_value=1.0, max_value=100.0, value=25.0)
-end_cell_size_y = st.sidebar.number_input("End Cell Size Y (Top-Left) (mm)", min_value=1.0, max_value=100.0, value=25.0)
+end_cell_size_x = st.sidebar.number_input("End Cell Size X (Bottom-Right) (mm)", min_value=1.0, max_value=100.0, value=15.0)
+end_cell_size_y = st.sidebar.number_input("End Cell Size Y (Top-Left) (mm)", min_value=1.0, max_value=100.0, value=15.0)
 
 if end_cell_size_x != end_cell_size_y:
     st.sidebar.info("Note: To keep all grid cells as perfect squares, the X and Y end sizes must be identical. Different X and Y gradients will cause off-diagonal cells to stretch into rectangles to keep the grid connected.")
@@ -69,12 +69,26 @@ alt_gap_y = st.sidebar.slider("Top Layer Horizontal Gap (mm)", 0.0, float(max_h)
 
 bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.5, 0.1)
 
+st.sidebar.subheader("S-Curve Gap Transition")
+s_curve_axis = st.sidebar.selectbox("Transition Axis", ["None", "X", "Y"])
+s_curve_point = 0
+s_curve_cells = 0
+s_curve_transition_gap = 0.0
+
+if s_curve_axis != "None":
+    max_point = int(cols) if s_curve_axis == "X" else int(rows)
+    label_point = "Transition Column" if s_curve_axis == "X" else "Transition Row"
+    s_curve_point = st.sidebar.number_input(label_point, min_value=0, max_value=max_point, value=max_point // 2)
+    s_curve_cells = st.sidebar.number_input("Transition Cells (Width of S-Curve)", min_value=0, max_value=max_point, value=min(3, max_point))
+    max_t_gap = max_w if s_curve_axis == "X" else max_h
+    s_curve_transition_gap = st.sidebar.slider("Transition Gap (mm)", 0.0, float(max_t_gap), 2.0, 0.1)
+
 # Keep tessellation selection state
 tessellation_position = st.session_state.get("tessellation_position", 9)  # Default to center (4)
 tessellation_tolerance = st.session_state.get("tess_tol", 0.0)
 
 # Create a signature for current settings to detect changes
-current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance)
+current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap)
 
 if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
     st.session_state.last_settings = current_settings
@@ -91,29 +105,11 @@ generator = VariableTabbedGrid(
     alt_gap_y=float(alt_gap_y) / 2.0, 
     bridge_size=float(bridge_size),
     tessellation_position=tessellation_position,
-    tessellation_tolerance=tessellation_tolerance
-)
-
-# Generate SVG for preview (with grid if enabled)
-svg_str_preview = generator.generate(
-    show_base=show_base,
-    show_top=show_top,
-    show_red=show_red,
-    show_grid=show_grid,
-    show_sheet=show_sheet,
-    align_x=align_x,
-    align_y=align_y
-)
-
-# Generate SVG for export (force grid off)
-svg_str_export = generator.generate(
-    show_base=show_base,
-    show_top=show_top,
-    show_red=show_red,
-    show_grid=False,
-    show_sheet=show_sheet,
-    align_x=align_x,
-    align_y=align_y
+    tessellation_tolerance=tessellation_tolerance,
+    s_curve_axis=s_curve_axis,
+    s_curve_point=float(s_curve_point),
+    s_curve_cells=float(s_curve_cells),
+    s_curve_transition_gap=float(s_curve_transition_gap) / 2.0
 )
 
 st.title("Tessellation Visualizer")
@@ -122,6 +118,38 @@ col1, col2 = st.columns([3, 1])
 
 with col1:
     st.markdown("### Preview")
+    layout_mode = st.radio("Layer Layout Mode", ["Overlaid", "Side-by-Side", "Stacked Vertically"], horizontal=True)
+    
+    # Create a signature for current settings to detect changes (including layout_mode)
+    current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, layout_mode)
+    
+    if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
+        st.session_state.last_settings = current_settings
+
+    # Generate SVG for preview (with grid if enabled)
+    svg_str_preview = generator.generate(
+        show_base=show_base,
+        show_top=show_top,
+        show_red=show_red,
+        show_grid=show_grid,
+        show_sheet=show_sheet,
+        align_x=align_x,
+        align_y=align_y,
+        layout_mode=layout_mode
+    )
+    
+    # Generate SVG for export (force grid off)
+    svg_str_export = generator.generate(
+        show_base=show_base,
+        show_top=show_top,
+        show_red=show_red,
+        show_grid=False,
+        show_sheet=show_sheet,
+        align_x=align_x,
+        align_y=align_y,
+        layout_mode=layout_mode
+    )
+    
     b64 = base64.b64encode(svg_str_preview.encode('utf-8')).decode("utf-8")
     
     # CSS wrapper for panning and zooming the SVG, with drag support and zoom controls

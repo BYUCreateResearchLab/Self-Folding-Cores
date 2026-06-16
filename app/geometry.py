@@ -2,7 +2,7 @@ import svgwrite
 import math
 
 class VariableGeometryGenerator:
-    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0):
+    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0, s_curve_axis='None', s_curve_point=0, s_curve_cells=0, s_curve_transition_gap=0.0):
         self.scale = 3.7795275591  # 96 DPI scale for LightBurn (1mm = 3.7795px)
         self.cols = cols
         self.rows = rows
@@ -16,6 +16,11 @@ class VariableGeometryGenerator:
         self.bridge_size = bridge_size
         self.tessellation_position = tessellation_position  # 0-8 for 3x3 grid (default 4 = center)
         self.tess_tolerance = tessellation_tolerance
+        
+        self.s_curve_axis = s_curve_axis
+        self.s_curve_point = s_curve_point
+        self.s_curve_cells = s_curve_cells
+        self.s_curve_transition_gap = s_curve_transition_gap
         
         self.cell_widths = [self._calc_cell_size_x(c) for c in range(cols)]
         self.cell_heights = [self._calc_cell_size_y(r) for r in range(rows)]
@@ -130,25 +135,63 @@ class VariableGeometryGenerator:
         return None, None
 
     def get_margins(self, row, col, is_inverted=False, is_red_layer=False):
+        norm_x, norm_y = self.normal_gap_x, self.normal_gap_y
+        alt_x, alt_y = self.alt_gap_x, self.alt_gap_y
+
+        if self.s_curve_axis == 'X':
+            start = self.s_curve_point - self.s_curve_cells / 2.0
+            if self.s_curve_cells == 0:
+                t = 1.0 if col >= self.s_curve_point else 0.0
+            else:
+                t = min(max((col - start) / self.s_curve_cells, 0.0), 1.0)
+            
+            if t < 0.5:
+                s = 0.5 - 0.5 * math.cos((t * 2.0) * math.pi)
+                norm_x = self.normal_gap_x + (self.s_curve_transition_gap - self.normal_gap_x) * s
+                alt_x = self.alt_gap_x + (self.s_curve_transition_gap - self.alt_gap_x) * s
+            else:
+                s = 0.5 - 0.5 * math.cos(((t - 0.5) * 2.0) * math.pi)
+                norm_x = self.s_curve_transition_gap + (self.alt_gap_x - self.s_curve_transition_gap) * s
+                alt_x = self.s_curve_transition_gap + (self.normal_gap_x - self.s_curve_transition_gap) * s
+
+        elif self.s_curve_axis == 'Y':
+            start = self.s_curve_point - self.s_curve_cells / 2.0
+            if self.s_curve_cells == 0:
+                t = 1.0 if row >= self.s_curve_point else 0.0
+            else:
+                t = min(max((row - start) / self.s_curve_cells, 0.0), 1.0)
+            
+            if t < 0.5:
+                s = 0.5 - 0.5 * math.cos((t * 2.0) * math.pi)
+                norm_y = self.normal_gap_y + (self.s_curve_transition_gap - self.normal_gap_y) * s
+                alt_y = self.alt_gap_y + (self.s_curve_transition_gap - self.alt_gap_y) * s
+            else:
+                s = 0.5 - 0.5 * math.cos(((t - 0.5) * 2.0) * math.pi)
+                norm_y = self.s_curve_transition_gap + (self.alt_gap_y - self.s_curve_transition_gap) * s
+                alt_y = self.s_curve_transition_gap + (self.normal_gap_y - self.s_curve_transition_gap) * s
+
         if is_red_layer:
-            return self.normal_gap_x, self.normal_gap_y
+            return norm_x, norm_y
         if not is_inverted:
-            return self.normal_gap_x, self.normal_gap_y
+            return norm_x, norm_y
             
         # For x-tabs (odd row and odd col), maintain the normal gap width
         if row % 2 != 0 and col % 2 != 0:
-            return self.normal_gap_x, self.normal_gap_y
+            return norm_x, norm_y
             
         is_large_square = (row // 2 + col // 2) % 2 == 0
         if is_inverted:
             is_large_square = not is_large_square
             
         if not is_large_square:
-            return self.alt_gap_x, self.alt_gap_y
+            return alt_x, alt_y
         else:
-            return self.normal_gap_x, self.normal_gap_y
+            return norm_x, norm_y
 
-    def create_drawing(self, show_sheet=False, sheet_w=279, sheet_h=216):
+    def create_drawing(self, show_sheet=False, sheet_w=279, sheet_h=216, total_w=None, total_h=None):
+        if total_w is None: total_w = self.canvas_width
+        if total_h is None: total_h = self.canvas_height
+        
         padding = 50
         if show_sheet:
             vw = sheet_w + padding * 2
@@ -157,8 +200,8 @@ class VariableGeometryGenerator:
             vx = -padding
             vy = -padding
         else:
-            vw = self.canvas_width + padding * 2
-            vh = self.canvas_height + padding * 2
+            vw = total_w + padding * 2
+            vh = total_h + padding * 2
             vx = -padding
             vy = -padding
             
@@ -255,16 +298,33 @@ class VariableGeometryGenerator:
 
 
 class VariableTabbedGrid(VariableGeometryGenerator):
-    def generate(self, show_base, show_top, show_red, show_grid, show_sheet=False, align_x=5.0, align_y=5.0):
+    def generate(self, show_base, show_top, show_red, show_grid, show_sheet=False, align_x=5.0, align_y=5.0, layout_mode="Overlaid"):
         sheet_w, sheet_h = 279, 216
+        
+        blocks = []
+        if show_base: blocks.append('base')
+        if show_top: blocks.append('top')
+        if show_red: blocks.append('red')
+        
+        num_blocks = len(blocks)
+        if num_blocks == 0 or layout_mode == "Overlaid" or show_sheet:
+            total_w = self.canvas_width
+            total_h = self.canvas_height
+        elif layout_mode == "Side-by-Side":
+            total_w = self.canvas_width * num_blocks + 20 * (num_blocks - 1)
+            total_h = self.canvas_height
+        else: # Stacked Vertically
+            total_w = self.canvas_width
+            total_h = self.canvas_height * num_blocks + 20 * (num_blocks - 1)
+            
         if show_sheet:
             self.offset_x = align_x
-            self.offset_y = sheet_h - self.canvas_height - align_y
+            self.offset_y = sheet_h - total_h - align_y
         else:
             self.offset_x = 0
             self.offset_y = 0
 
-        self.current_dwg = self.create_drawing(show_sheet, sheet_w, sheet_h)
+        self.current_dwg = self.create_drawing(show_sheet, sheet_w, sheet_h, total_w, total_h)
 
         if show_sheet:
             # Draw the sheet boundary
@@ -280,20 +340,46 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         if show_grid:
             self._draw_10x10_grid(show_sheet, sheet_w, sheet_h)
 
+        base_offset_x = self.offset_x
+        base_offset_y = self.offset_y
+        
+        block_idx = 0
+
         # 2. Museum Board Base (White Layer)
         if show_base:
+            if layout_mode == "Side-by-Side" and not show_sheet:
+                self.offset_x = base_offset_x + block_idx * (self.canvas_width + 20)
+            elif layout_mode == "Stacked Vertically" and not show_sheet:
+                self.offset_y = base_offset_y + block_idx * (self.canvas_height + 20)
+            
             self._draw_grid_layer(is_inverted=False, style=self.stroke_style)
             self._draw_boundary_gaps(is_inverted=False, style=self.stroke_style)
             self._draw_clip_boundaries(is_inverted=False, style=self.stroke_style)
+            block_idx += 1
 
         # 3. Museum Board Top (Green Layer)
         if show_top:
+            if layout_mode == "Side-by-Side" and not show_sheet:
+                self.offset_x = base_offset_x + block_idx * (self.canvas_width + 20)
+                self.offset_y = base_offset_y
+            elif layout_mode == "Stacked Vertically" and not show_sheet:
+                self.offset_x = base_offset_x
+                self.offset_y = base_offset_y + block_idx * (self.canvas_height + 20)
+                
             self._draw_grid_layer(is_inverted=True, style=self.green_stroke_style)
             self._draw_boundary_gaps(is_inverted=True, style=self.green_stroke_style)
             self._draw_clip_boundaries(is_inverted=True, style=self.green_stroke_style)
+            block_idx += 1
 
         # 4. Shrinky Dink & Tape Sheets (Red Layer)
         if show_red:
+            if layout_mode == "Side-by-Side" and not show_sheet:
+                self.offset_x = base_offset_x + block_idx * (self.canvas_width + 20)
+                self.offset_y = base_offset_y
+            elif layout_mode == "Stacked Vertically" and not show_sheet:
+                self.offset_x = base_offset_x
+                self.offset_y = base_offset_y + block_idx * (self.canvas_height + 20)
+                
             self._draw_red_layer()
 
         # Finalize
