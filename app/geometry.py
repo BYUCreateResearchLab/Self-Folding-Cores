@@ -2,7 +2,7 @@ import svgwrite
 import math
 
 class VariableGeometryGenerator:
-    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0, s_curve_axis='None', s_curve_point=0, s_curve_cells=0, s_curve_transition_gap=0.0):
+    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0, s_curve_axis='None', s_curve_point=0, s_curve_cells=0, s_curve_transition_gap=0.0, enable_gradient=True, enable_tessellation=True):
         self.scale = 3.7795275591  # 96 DPI scale for LightBurn (1mm = 3.7795px)
         self.cols = cols
         self.rows = rows
@@ -16,11 +16,14 @@ class VariableGeometryGenerator:
         self.bridge_size = bridge_size
         self.tessellation_position = tessellation_position  # 0-8 for 3x3 grid (default 4 = center)
         self.tess_tolerance = tessellation_tolerance
-        
+
         self.s_curve_axis = s_curve_axis
         self.s_curve_point = s_curve_point
         self.s_curve_cells = s_curve_cells
         self.s_curve_transition_gap = s_curve_transition_gap
+
+        self.enable_gradient = enable_gradient
+        self.enable_tessellation = enable_tessellation
         
         self.cell_widths = [self._calc_cell_size_x(c) for c in range(cols)]
         self.cell_heights = [self._calc_cell_size_y(r) for r in range(rows)]
@@ -50,10 +53,14 @@ class VariableGeometryGenerator:
         self.current_dwg = None
 
     def _calc_cell_size_x(self, col):
+        if not self.enable_gradient:
+            return self.start_cell_size
         if self.cols <= 1: return self.start_cell_size
         return self.start_cell_size + (self.end_cell_size_x - self.start_cell_size) * (col / (self.cols - 1))
 
     def _calc_cell_size_y(self, row):
+        if not self.enable_gradient:
+            return self.start_cell_size
         if self.rows <= 1: return self.start_cell_size
         progress = (self.rows - 1 - row) / (self.rows - 1)  # Bottom row is 0.0, Top row is 1.0
         return self.start_cell_size + (self.end_cell_size_y - self.start_cell_size) * progress
@@ -61,18 +68,26 @@ class VariableGeometryGenerator:
 
     def _should_split_top_edge(self):
         """Returns True if top edge should be split in half for tessellation"""
+        if not self.enable_tessellation:
+            return False
         return self.tessellation_position in [3, 4, 5, 6, 7, 8]
-    
+
     def _should_split_bottom_edge(self):
         """Returns True if bottom edge should be split in half for tessellation"""
+        if not self.enable_tessellation:
+            return False
         return self.tessellation_position in [0, 1, 2, 3, 4, 5]
-    
+
     def _should_split_left_edge(self):
         """Returns True if left edge should be split in half for tessellation"""
+        if not self.enable_tessellation:
+            return False
         return self.tessellation_position in [1, 2, 4, 5, 7, 8]
-    
+
     def _should_split_right_edge(self):
         """Returns True if right edge should be split in half for tessellation"""
+        if not self.enable_tessellation:
+            return False
         return self.tessellation_position in [0, 1, 3, 4, 6, 7]
 
     @property

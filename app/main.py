@@ -33,13 +33,9 @@ st.sidebar.subheader("Grid Dimensions")
 cols = st.sidebar.number_input("Columns", min_value=1, max_value=50, value=15)
 rows = st.sidebar.number_input("Rows", min_value=1, max_value=50, value=11)
 
-st.sidebar.subheader("Cell Dimensions (Gradient)")
-start_cell_size = st.sidebar.number_input("Start Cell Size (Bottom-Left) (mm)", min_value=1.0, max_value=100.0, value=15.0)
-end_cell_size_x = st.sidebar.number_input("End Cell Size X (Bottom-Right) (mm)", min_value=1.0, max_value=100.0, value=15.0)
-end_cell_size_y = st.sidebar.number_input("End Cell Size Y (Top-Left) (mm)", min_value=1.0, max_value=100.0, value=15.0)
-
-if end_cell_size_x != end_cell_size_y:
-    st.sidebar.info("Note: To keep all grid cells as perfect squares, the X and Y end sizes must be identical. Different X and Y gradients will cause off-diagonal cells to stretch into rectangles to keep the grid connected.")
+start_cell_size = st.session_state.get("start_cell_size", 15.0)
+end_cell_size_x = st.session_state.get("end_cell_size_x", 15.0)
+end_cell_size_y = st.session_state.get("end_cell_size_y", 15.0)
 
 max_w = max(start_cell_size, end_cell_size_x)
 max_h = max(start_cell_size, end_cell_size_y)
@@ -66,33 +62,76 @@ if s_curve_axis != "None":
     max_t_gap = max_w if s_curve_axis == "X" else max_h
     s_curve_transition_gap = st.sidebar.slider("Transition Gap (mm)", 0.0, float(max_t_gap), 2.0, 0.1)
 
-# Keep tessellation selection state
-tessellation_position = st.session_state.get("tessellation_position", 9)  # Default to center (4)
+st.sidebar.subheader("Gradient")
+enable_gradient = st.sidebar.checkbox("Enable Gradient (Varying Cell Sizes)", key="enable_gradient", value=True)
+
+if enable_gradient:
+    start_cell_size = st.sidebar.number_input("Start Cell Size (Bottom-Left) (mm)", min_value=1.0, max_value=100.0, value=start_cell_size)
+    end_cell_size_x = st.sidebar.number_input("End Cell Size X (Bottom-Right) (mm)", min_value=1.0, max_value=100.0, value=end_cell_size_x)
+    end_cell_size_y = st.sidebar.number_input("End Cell Size Y (Top-Left) (mm)", min_value=1.0, max_value=100.0, value=end_cell_size_y)
+
+    if end_cell_size_x != end_cell_size_y:
+        st.sidebar.info("Note: To keep all grid cells as perfect squares, the X and Y end sizes must be identical. Different X and Y gradients will cause off-diagonal cells to stretch into rectangles to keep the grid connected.")
+
+    max_w = max(start_cell_size, end_cell_size_x)
+    max_h = max(start_cell_size, end_cell_size_y)
+else:
+    max_w = start_cell_size
+    max_h = start_cell_size
+
+st.sidebar.subheader("Tessellation")
+enable_tessellation = st.sidebar.checkbox("Enable Tessellation (Edge Splitting)", key="enable_tessellation", value=True)
+
+tessellation_position = st.session_state.get("tessellation_position", 9)
 tessellation_tolerance = st.session_state.get("tess_tol", 0.0)
 
+if enable_tessellation:
+    st.sidebar.write("**Tessellation Position**")
+    st.sidebar.button("Normal (No modifications)", key="tess_pos_9", use_container_width=True, help="No tessellation modifications", on_click=set_tess_pos, args=(9,))
+    st.sidebar.write("Select position in 3×3 grid:")
+    positions = [
+        (0, "Top-Left"), (1, "Top-Center"), (2, "Top-Right"),
+        (3, "Middle-Left"), (4, "Center"), (5, "Middle-Right"),
+        (6, "Bottom-Left"), (7, "Bottom-Center"), (8, "Bottom-Right"),
+        (9, "Normal"),
+    ]
+    cols_small = st.sidebar.columns(3)
+    for idx, (pos_idx, pos_name) in enumerate(positions[:9]):
+        col_idx = idx % 3
+        with cols_small[col_idx]:
+            short_name = pos_name.replace("Top-", "T-").replace("Bottom-", "B-").replace("Middle-", "M-").replace("Center", "C").replace("-C", "C").replace("-Left", "L").replace("-Right", "R")
+            st.button(short_name, key="tess_pos_" + str(pos_idx), use_container_width=True, help=pos_name, on_click=set_tess_pos, args=(pos_idx,))
+    current_pos = st.session_state.get("tessellation_position", 9)
+    st.sidebar.write("Current: " + dict(positions).get(current_pos, "Unknown"))
+
+    st.sidebar.write("**Tessellation Adjustments**")
+    tessellation_tolerance = st.sidebar.slider("Tolerance (mm)", min_value=-10.0, max_value=10.0, value=tessellation_tolerance, step=0.1, key="tess_tol", help="Positive = smaller shape (cut inward). Negative = bigger shape (cut outward).")
+
 # Create a signature for current settings to detect changes
-current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap)
+current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, enable_gradient, enable_tessellation)
 
 if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
     st.session_state.last_settings = current_settings
 
 generator = VariableTabbedGrid(
-    cols=int(cols), 
-    rows=int(rows), 
-    start_cell_size=float(start_cell_size), 
-    end_cell_size_x=float(end_cell_size_x), 
-    end_cell_size_y=float(end_cell_size_y), 
-    normal_gap_x=float(normal_gap_x) / 2.0, 
-    normal_gap_y=float(normal_gap_y) / 2.0, 
-    alt_gap_x=float(alt_gap_x) / 2.0, 
-    alt_gap_y=float(alt_gap_y) / 2.0, 
+    cols=int(cols),
+    rows=int(rows),
+    start_cell_size=float(start_cell_size),
+    end_cell_size_x=float(end_cell_size_x),
+    end_cell_size_y=float(end_cell_size_y),
+    normal_gap_x=float(normal_gap_x) / 2.0,
+    normal_gap_y=float(normal_gap_y) / 2.0,
+    alt_gap_x=float(alt_gap_x) / 2.0,
+    alt_gap_y=float(alt_gap_y) / 2.0,
     bridge_size=float(bridge_size),
     tessellation_position=tessellation_position,
     tessellation_tolerance=tessellation_tolerance,
     s_curve_axis=s_curve_axis,
     s_curve_point=float(s_curve_point),
     s_curve_cells=float(s_curve_cells),
-    s_curve_transition_gap=float(s_curve_transition_gap) / 2.0
+    s_curve_transition_gap=float(s_curve_transition_gap) / 2.0,
+    enable_gradient=enable_gradient,
+    enable_tessellation=enable_tessellation
 )
 
 st.title("Tessellation Visualizer")
@@ -118,7 +157,7 @@ with col1:
     st.button(f"Layout Mode: {layout_mode}", on_click=cycle_layout_mode)
     
     # Create a signature for current settings to detect changes (including layout_mode)
-    current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, layout_mode)
+    current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, layout_mode, enable_gradient, enable_tessellation)
     
     if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
         st.session_state.last_settings = current_settings
@@ -366,30 +405,9 @@ with col2:
         file_name="tessellation.svg",
         mime="image/svg+xml"
     )
-    
+
     st.markdown("---")
     st.markdown("### Pattern Alignment on Sheet")
     st.number_input("X Offset (mm)", value=5.0, step=1.0, key="align_x")
     st.number_input("Y Offset (mm)", value=5.0, step=1.0, key="align_y")
 
-    st.markdown("---")
-    st.markdown("### Tessellation Position")
-    st.button("Normal (No modifications)", key="tess_pos_9", use_container_width=True, help="No tessellation modifications", on_click=set_tess_pos, args=(9,))
-    st.markdown("Select where this pattern is in a 3×3 grid:")
-    positions = [
-        (0, "Top-Left"), (1, "Top-Center"), (2, "Top-Right"),
-        (3, "Middle-Left"), (4, "Center"), (5, "Middle-Right"),
-        (6, "Bottom-Left"), (7, "Bottom-Center"), (8, "Bottom-Right"),
-        (9, "Normal"),
-    ]
-    cols_small = st.columns(3)
-    for idx, (pos_idx, pos_name) in enumerate(positions[:9]):
-        col_idx = idx % 3
-        with cols_small[col_idx]:
-            short_name = pos_name.replace("Top-", "T-").replace("Bottom-", "B-").replace("Middle-", "M-").replace("Center", "C").replace("-C", "C").replace("-Left", "L").replace("-Right", "R")
-            st.button(short_name, key="tess_pos_" + str(pos_idx), use_container_width=True, help=pos_name, on_click=set_tess_pos, args=(pos_idx,))
-    current_pos = st.session_state.get("tessellation_position", 9)
-    st.write("Current:", dict(positions).get(current_pos, "Unknown"))
-
-    st.markdown("#### Tessellation Adjustments")
-    st.slider("Tolerance (mm)", min_value=-10.0, max_value=10.0, value=0.0, step=0.1, key="tess_tol", help="Positive = smaller shape (cut inward). Negative = bigger shape (cut outward).")
