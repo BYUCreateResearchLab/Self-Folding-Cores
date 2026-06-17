@@ -2,7 +2,7 @@ import svgwrite
 import math
 
 class VariableGeometryGenerator:
-    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0, s_curve_axis='None', s_curve_point=0, s_curve_cells=0, s_curve_transition_gap=0.0, enable_gradient=True, enable_tessellation=True):
+    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0, s_curve_axis='None', s_curve_point=0, s_curve_cells=0, s_curve_transition_gap=0.0, enable_gradient=True, enable_tessellation=True, enable_fixed_connector_length=False, fixed_connector_length=7.5):
         self.scale = 3.7795275591  # 96 DPI scale for LightBurn (1mm = 3.7795px)
         self.cols = cols
         self.rows = rows
@@ -24,6 +24,8 @@ class VariableGeometryGenerator:
 
         self.enable_gradient = enable_gradient
         self.enable_tessellation = enable_tessellation
+        self.enable_fixed_connector_length = enable_fixed_connector_length
+        self.fixed_connector_length = fixed_connector_length
         
         self.cell_widths = [self._calc_cell_size_x(c) for c in range(cols)]
         self.cell_heights = [self._calc_cell_size_y(r) for r in range(rows)]
@@ -56,12 +58,24 @@ class VariableGeometryGenerator:
         if not self.enable_gradient:
             return self.start_cell_size
         if self.cols <= 1: return self.start_cell_size
+
+        # For odd columns (connectors), use fixed length if enabled
+        if self.enable_fixed_connector_length and col % 2 == 1:
+            return self.fixed_connector_length
+
+        # For even columns (large squares), interpolate based on gradient
         return self.start_cell_size + (self.end_cell_size_x - self.start_cell_size) * (col / (self.cols - 1))
 
     def _calc_cell_size_y(self, row):
         if not self.enable_gradient:
             return self.start_cell_size
         if self.rows <= 1: return self.start_cell_size
+
+        # For odd rows (connectors), use fixed length if enabled
+        if self.enable_fixed_connector_length and row % 2 == 1:
+            return self.fixed_connector_length
+
+        # For even rows (large squares), interpolate based on gradient
         progress = (self.rows - 1 - row) / (self.rows - 1)  # Bottom row is 0.0, Top row is 1.0
         return self.start_cell_size + (self.end_cell_size_y - self.start_cell_size) * progress
 
@@ -482,13 +496,21 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     left_is_large = (row // 2 + (col - 1) // 2) % 2 == 0
                     if is_inverted: left_is_large = not left_is_large
 
-                    if left_is_large:
+                    # When fixed connector length is enabled, connectors span the full cell width
+                    # (which is now set to fixed_connector_length for odd columns)
+                    if self.enable_fixed_connector_length:
+                        end_x = x + cell_w
+                    elif left_is_large:
                         end_x = x + cell_w - m_right_x
+                    else:
+                        end_x = x + cell_w
+
+                    if left_is_large:
                         self.draw_solid_line((x, y1_L), (end_x, y1_R), style)
                         self.draw_solid_line((end_x, y1_R), (end_x, y2_R), style)
                         self.draw_solid_line((end_x, y2_R), (x, y2_L), style)
                     else:
-                        start_x, end_x = x + m_left_x, x + cell_w
+                        start_x = x if self.enable_fixed_connector_length else x + m_left_x
                         self.draw_solid_line((start_x, y1_L), (end_x, y1_R), style)
                         self.draw_solid_line((start_x, y1_L), (start_x, y2_L), style)
                         self.draw_solid_line((start_x, y2_L), (end_x, y2_R), style)
@@ -502,13 +524,21 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     top_is_large = ((row - 1) // 2 + col // 2) % 2 == 0
                     if is_inverted: top_is_large = not top_is_large
 
-                    if top_is_large:
+                    # When fixed connector length is enabled, connectors span the full cell height
+                    # (which is now set to fixed_connector_length for odd rows)
+                    if self.enable_fixed_connector_length:
+                        end_y = y + cell_h
+                    elif top_is_large:
                         end_y = y + cell_h - m_bottom_y
+                    else:
+                        end_y = y + cell_h
+
+                    if top_is_large:
                         self.draw_solid_line((x1_T, y), (x1_B, end_y), style)
                         self.draw_solid_line((x2_T, y), (x2_B, end_y), style)
                         self.draw_solid_line((x1_B, end_y), (x2_B, end_y), style)
                     else:
-                        start_y, end_y = y + m_top_y, y + cell_h
+                        start_y = y if self.enable_fixed_connector_length else y + m_top_y
                         self.draw_solid_line((x1_T, start_y), (x1_B, end_y), style)
                         self.draw_solid_line((x2_T, start_y), (x2_B, end_y), style)
                         self.draw_solid_line((x1_T, start_y), (x2_T, start_y), style)

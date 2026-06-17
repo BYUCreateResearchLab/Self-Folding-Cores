@@ -73,9 +73,19 @@ if enable_gradient:
     if end_cell_size_x != end_cell_size_y:
         st.sidebar.info("Note: To keep all grid cells as perfect squares, the X and Y end sizes must be identical. Different X and Y gradients will cause off-diagonal cells to stretch into rectangles to keep the grid connected.")
 
+    enable_fixed_connector_length = st.sidebar.checkbox("Keep Connector Lengths Constant", key="enable_fixed_connector_length", value=False, help="Maintain constant length for connecting rectangles while allowing width to vary as trapezoids")
+
+    if enable_fixed_connector_length:
+        default_connector_length = start_cell_size / 2.0
+        connector_length_mm = st.sidebar.slider("Connector Length (mm)", min_value=0.5, max_value=float(max(start_cell_size, end_cell_size_x, end_cell_size_y)), value=default_connector_length, step=0.1)
+    else:
+        connector_length_mm = 0.0
+
     max_w = max(start_cell_size, end_cell_size_x)
     max_h = max(start_cell_size, end_cell_size_y)
 else:
+    enable_fixed_connector_length = False
+    connector_length_mm = 0.0
     max_w = start_cell_size
     max_h = start_cell_size
 
@@ -108,7 +118,7 @@ if enable_tessellation:
     tessellation_tolerance = st.sidebar.slider("Tolerance (mm)", min_value=-10.0, max_value=10.0, value=tessellation_tolerance, step=0.1, key="tess_tol", help="Positive = smaller shape (cut inward). Negative = bigger shape (cut outward).")
 
 # Create a signature for current settings to detect changes
-current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, enable_gradient, enable_tessellation)
+current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, enable_gradient, enable_tessellation, enable_fixed_connector_length, connector_length_mm)
 
 if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
     st.session_state.last_settings = current_settings
@@ -131,7 +141,9 @@ generator = VariableTabbedGrid(
     s_curve_cells=float(s_curve_cells),
     s_curve_transition_gap=float(s_curve_transition_gap) / 2.0,
     enable_gradient=enable_gradient,
-    enable_tessellation=enable_tessellation
+    enable_tessellation=enable_tessellation,
+    enable_fixed_connector_length=enable_fixed_connector_length,
+    fixed_connector_length=float(connector_length_mm)
 )
 
 st.title("Tessellation Visualizer")
