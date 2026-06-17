@@ -232,10 +232,9 @@ class VariableGeometryGenerator:
     def draw_polygon(self, points, style=None):
         if style is None: style = self.stroke_style
         if not points: return
-        for i in range(len(points)):
-            p1 = points[i]
-            p2 = points[(i + 1) % len(points)]
-            self.draw_solid_line(p1, p2, style)
+        translated_points = self._translate_points(points)
+        if self.current_dwg:
+            self.current_dwg.add(self.current_dwg.polygon(points=translated_points, **style))
 
     def has_xtab(self, r, c):
         return 0 <= r < self.rows and 0 <= c < self.cols
@@ -693,59 +692,17 @@ class VariableTabbedGrid(VariableGeometryGenerator):
 
             return (px, py)
 
-        # Top
-        row, y = 0, 0
-        for col in range(self.cols):
-            x = self.cell_x[col]
-            cell_w = self.cell_widths[col]
-            if col % 2 == 0:
-                mx, my = self.get_margins(row, col, is_red_layer=is_red_layer)
-                points.extend([(x + mx, y + my), (x + cell_w - mx, y + my)])
-            else:
-                m_left_x, m_left_y = self.get_margins(row, col - 1, is_red_layer=is_red_layer)
-                m_right_x, m_right_y = self.get_margins(row, col + 1, is_red_layer=is_red_layer)
-                points.extend([(x + m_left_x, y + m_left_y), (x + cell_w - m_right_x, y + m_right_y)])
+        mx_tl, my_tl = self.get_margins(0, 0, is_red_layer=is_red_layer)
+        mx_tr, my_tr = self.get_margins(0, self.cols - 1, is_red_layer=is_red_layer)
+        mx_br, my_br = self.get_margins(self.rows - 1, self.cols - 1, is_red_layer=is_red_layer)
+        mx_bl, my_bl = self.get_margins(self.rows - 1, 0, is_red_layer=is_red_layer)
 
-        # Right
-        col = self.cols - 1
-        x_right = self.canvas_width
-        for row in range(self.rows):
-            y = self.cell_y[row]
-            cell_h = self.cell_heights[row]
-            if row % 2 == 0:
-                mx, my = self.get_margins(row, col, is_red_layer=is_red_layer)
-                points.extend([(x_right - mx, y + my), (x_right - mx, y + cell_h - my)])
-            else:
-                m_top_x, m_top_y = self.get_margins(row - 1, col, is_red_layer=is_red_layer)
-                m_bottom_x, m_bottom_y = self.get_margins(row + 1, col, is_red_layer=is_red_layer)
-                points.extend([(x_right - m_top_x, y + m_top_y), (x_right - m_bottom_x, y + cell_h - m_bottom_y)])
-
-        # Bottom
-        row = self.rows - 1
-        y_bottom = self.canvas_height
-        for col in range(self.cols - 1, -1, -1):
-            x = self.cell_x[col]
-            cell_w = self.cell_widths[col]
-            if col % 2 == 0:
-                mx, my = self.get_margins(row, col, is_red_layer=is_red_layer)
-                points.extend([(x + cell_w - mx, y_bottom - my), (x + mx, y_bottom - my)])
-            else:
-                m_left_x, m_left_y = self.get_margins(row, col - 1, is_red_layer=is_red_layer)
-                m_right_x, m_right_y = self.get_margins(row, col + 1, is_red_layer=is_red_layer)
-                points.extend([(x + cell_w - m_right_x, y_bottom - m_right_y), (x + m_left_x, y_bottom - m_left_y)])
-
-        # Left
-        col, x = 0, 0
-        for row in range(self.rows - 1, -1, -1):
-            y = self.cell_y[row]
-            cell_h = self.cell_heights[row]
-            if row % 2 == 0:
-                mx, my = self.get_margins(row, col, is_red_layer=is_red_layer)
-                points.extend([(x + mx, y + cell_h - my), (x + mx, y + my)])
-            else:
-                m_top_x, m_top_y = self.get_margins(row - 1, col, is_red_layer=is_red_layer)
-                m_bottom_x, m_bottom_y = self.get_margins(row + 1, col, is_red_layer=is_red_layer)
-                points.extend([(x + m_bottom_x, y + cell_h - m_bottom_y), (x + m_top_x, y + m_top_y)])
+        points = [
+            (mx_tl, my_tl),
+            (self.canvas_width - mx_tr, my_tr),
+            (self.canvas_width - mx_br, self.canvas_height - my_br),
+            (mx_bl, self.canvas_height - my_bl)
+        ]
 
         for row in range(self.rows):
             for col in range(self.cols):
