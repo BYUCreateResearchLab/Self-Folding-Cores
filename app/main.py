@@ -381,7 +381,7 @@ with col1:
                 const dx = event.clientX - startX;
                 const dy = event.clientY - startY;
                 preview.scrollLeft = startScrollLeft - dx;
-                preview.scrollTop = startScrollTop - dy;
+                preview.scrollTop = startScrollTop - dy;30.002
                 saveState();
             }
         });
