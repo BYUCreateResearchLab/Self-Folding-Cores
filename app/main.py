@@ -18,9 +18,9 @@ if 'layout_mode_idx' not in st.session_state:
 st.sidebar.title("Parameters")
 
 st.sidebar.subheader("Grid Dimensions")
-cols = st.sidebar.number_input("Columns", min_value=1, max_value=50, value=15)
-rows = st.sidebar.number_input("Rows", min_value=1, max_value=50, value=11)
-start_cell_size = st.sidebar.number_input("Start Cell Size (mm)", min_value=1.0, max_value=100.0, value=15.0)
+cols = st.sidebar.number_input("Columns", min_value=1, max_value=50, value=15, key="cols")
+rows = st.sidebar.number_input("Rows", min_value=1, max_value=50, value=11, key="rows")
+start_cell_size = st.sidebar.number_input("Start Cell Size (mm)", min_value=1.0, max_value=100.0, value=15.0, key="start_cell_size")
 
 for state_key, default_value in [
     ("show_base", True),
@@ -28,6 +28,21 @@ for state_key, default_value in [
     ("show_red", True),
     ("show_grid", True),
     ("show_sheet", True),
+    ("align_x", 5.0),
+    ("align_y", 5.0),
+    ("end_cell_size_x", 15.0),
+    ("end_cell_size_y", 15.0),
+    ("normal_gap_x", 3.0),
+    ("normal_gap_y", 3.0),
+    ("alt_gap_x", 1.0),
+    ("alt_gap_y", 1.0),
+    ("uniform_gap", 3.0),
+    ("bridge_size", 0.8),
+    ("enable_connector_gaps", False),
+    ("connector_gap_ratio", 1.0/3.0),
+    ("gapped_rows_str", "1,3,5"),
+    ("gapped_cols_str", "1,3,5"),
+    ("connector_length_mm", 7.5),
 ]:
     if state_key not in st.session_state:
         st.session_state[state_key] = default_value
@@ -38,12 +53,12 @@ show_red = st.session_state.show_red
 show_grid = st.session_state.show_grid
 show_sheet = st.session_state.show_sheet
 
-align_x = st.session_state.get("align_x", 5.0)
-align_y = st.session_state.get("align_y", 5.0)
+align_x = st.session_state.align_x
+align_y = st.session_state.align_y
 
-end_cell_size_x = st.session_state.get("end_cell_size_x", 15.0)
-end_cell_size_y = st.session_state.get("end_cell_size_y", 15.0)
-enable_curvature = st.sidebar.checkbox("Enable Curvature", value=False)
+end_cell_size_x = st.session_state.end_cell_size_x
+end_cell_size_y = st.session_state.end_cell_size_y
+enable_curvature = st.sidebar.checkbox("Enable Curvature", value=False, key="enable_curvature")
 
 if enable_curvature:
     max_w = max(start_cell_size, end_cell_size_x)
@@ -71,25 +86,38 @@ if enable_curvature:
         s_curve_cells = 0
         s_curve_transition_gap = 0.0
 else:
-    uniform_gap = st.sidebar.slider("Gap Size (mm)", 0.0, float(max(start_cell_size, end_cell_size_x, end_cell_size_y)), 3.0, 0.1)
+    uniform_gap = st.sidebar.slider("Gap Size (mm)", 0.0, float(max(start_cell_size, end_cell_size_x, end_cell_size_y)), 3.0, 0.1, key="uniform_gap")
     normal_gap_x = uniform_gap
     normal_gap_y = uniform_gap
     alt_gap_x = uniform_gap
     alt_gap_y = uniform_gap
     s_curve_axis = "None"
-    s_curve_point = 0
-    s_curve_cells = 0
-    s_curve_transition_gap = 0.0
+    s_curve_point = st.session_state.get("s_curve_point", 0)
+    s_curve_cells = st.session_state.get("s_curve_cells", 0)
+    s_curve_transition_gap = st.session_state.get("s_curve_transition_gap", 0.0)
 
 st.sidebar.subheader("Margins & Tabs")
-bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.8, 0.1)
+bridge_size = st.sidebar.slider("Bridge Size (mm)", 0.1, 5.0, 0.8, 0.1, key="bridge_size")
 
+st.sidebar.subheader("Connector Gaps")
+enable_connector_gaps = st.sidebar.checkbox("Enable Connector Gaps", key="enable_connector_gaps")
+if enable_connector_gaps:
+    st.sidebar.slider("Gap Size Ratio", min_value=0.0, max_value=0.5, step=0.01, help="Size of the removed middle section as a ratio of connector width. Max is 0.5 (50%).", key="connector_gap_ratio")
+    st.sidebar.text_input("Gapped Rows (horizontal connectors)", help="Comma-separated list of odd row indices to apply gaps.", key="gapped_rows_str")
+    st.sidebar.text_input("Gapped Columns (vertical connectors)", help="Comma-separated list of odd column indices to apply gaps.", key="gapped_cols_str")
+
+connector_gap_ratio = st.session_state.connector_gap_ratio
+gapped_rows_str = st.session_state.gapped_rows_str if enable_connector_gaps else ""
+gapped_cols_str = st.session_state.gapped_cols_str if enable_connector_gaps else ""
+
+gapped_rows = [int(i.strip()) for i in gapped_rows_str.split(',') if i.strip().isdigit()]
+gapped_cols = [int(i.strip()) for i in gapped_cols_str.split(',') if i.strip().isdigit()]
 st.sidebar.subheader("Gradient")
 enable_gradient = st.sidebar.checkbox("Enable Gradient (Varying Cell Sizes)", key="enable_gradient", value=True)
 
 if enable_gradient:
-    end_cell_size_x = st.sidebar.number_input("End Cell Size X (Bottom-Right) (mm)", min_value=1.0, max_value=100.0, value=end_cell_size_x)
-    end_cell_size_y = st.sidebar.number_input("End Cell Size Y (Top-Left) (mm)", min_value=1.0, max_value=100.0, value=end_cell_size_y)
+    end_cell_size_x = st.sidebar.number_input("End Cell Size X (Bottom-Right) (mm)", min_value=1.0, max_value=100.0, value=end_cell_size_x, key="end_cell_size_x")
+    end_cell_size_y = st.sidebar.number_input("End Cell Size Y (Top-Left) (mm)", min_value=1.0, max_value=100.0, value=end_cell_size_y, key="end_cell_size_y")
 
     if end_cell_size_x != end_cell_size_y:
         st.sidebar.info("Note: To keep all grid cells as perfect squares, the X and Y end sizes must be identical. Different X and Y gradients will cause off-diagonal cells to stretch into rectangles to keep the grid connected.")
@@ -98,7 +126,7 @@ if enable_gradient:
 
     if enable_fixed_connector_length:
         default_connector_length = start_cell_size / 2.0
-        connector_length_mm = st.sidebar.slider("Connector Length (mm)", min_value=0.5, max_value=float(max(start_cell_size, end_cell_size_x, end_cell_size_y)), value=default_connector_length, step=0.1)
+        connector_length_mm = st.sidebar.slider("Connector Length (mm)", min_value=0.5, max_value=float(max(start_cell_size, end_cell_size_x, end_cell_size_y)), value=default_connector_length, step=0.1, key="connector_length_mm")
     else:
         connector_length_mm = 0.0
 
@@ -139,7 +167,7 @@ if enable_tessellation:
     tessellation_tolerance = st.sidebar.slider("Tolerance (mm)", min_value=-10.0, max_value=10.0, value=tessellation_tolerance, step=0.1, key="tess_tol", help="Positive = smaller shape (cut inward). Negative = bigger shape (cut outward).")
 
 # Create a signature for current settings to detect changes
-current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, enable_curvature, enable_gradient, enable_tessellation, enable_fixed_connector_length, connector_length_mm)
+current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, enable_curvature, enable_gradient, enable_tessellation, enable_fixed_connector_length, connector_length_mm, enable_connector_gaps, connector_gap_ratio, gapped_rows, gapped_cols)
 
 if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
     st.session_state.last_settings = current_settings
@@ -164,7 +192,11 @@ generator = VariableTabbedGrid(
     enable_gradient=enable_gradient,
     enable_tessellation=enable_tessellation,
     enable_fixed_connector_length=enable_fixed_connector_length,
-    fixed_connector_length=float(connector_length_mm)
+    fixed_connector_length=float(connector_length_mm),
+    enable_connector_gaps=enable_connector_gaps,
+    connector_gap_ratio=float(connector_gap_ratio),
+    gapped_rows=gapped_rows,
+    gapped_cols=gapped_cols
 )
 
 st.title("Tessellation Visualizer")
@@ -186,7 +218,7 @@ with col1:
     st.button(f"Layout Mode: {layout_mode}", on_click=cycle_layout_mode)
     
     # Create a signature for current settings to detect changes (including layout_mode)
-    current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, enable_curvature, layout_mode, enable_gradient, enable_tessellation)
+    current_settings = (cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, show_base, show_top, show_red, show_grid, show_sheet, align_x, align_y, tessellation_position, tessellation_tolerance, s_curve_axis, s_curve_point, s_curve_cells, s_curve_transition_gap, enable_curvature, layout_mode, enable_gradient, enable_tessellation, enable_connector_gaps, connector_gap_ratio, gapped_rows, gapped_cols)
     
     if 'last_settings' not in st.session_state or st.session_state.last_settings != current_settings:
         st.session_state.last_settings = current_settings
@@ -452,7 +484,7 @@ with col2:
     st.checkbox("Show 10x10mm Grid", key="show_grid")
     st.checkbox("8.5\" x 11\" landscape boundary (279mm × 216mm)", key="show_sheet")
 
-    # st.markdown("---")
+    st.markdown("---")
     st.markdown("### Pattern Alignment on Sheet")
     st.number_input("X Offset (mm)", value=5.0, step=1.0, key="align_x")
     st.number_input("Y Offset (mm)", value=5.0, step=1.0, key="align_y")

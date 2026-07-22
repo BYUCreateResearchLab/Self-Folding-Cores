@@ -2,7 +2,7 @@ import svgwrite
 import math
 
 class VariableGeometryGenerator:
-    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0, s_curve_axis='None', s_curve_point=0, s_curve_cells=0, s_curve_transition_gap=0.0, enable_gradient=True, enable_tessellation=True, enable_fixed_connector_length=False, fixed_connector_length=7.5):
+    def __init__(self, cols, rows, start_cell_size, end_cell_size_x, end_cell_size_y, normal_gap_x, normal_gap_y, alt_gap_x, alt_gap_y, bridge_size, tessellation_position=4, tessellation_tolerance=0.0, s_curve_axis='None', s_curve_point=0, s_curve_cells=0, s_curve_transition_gap=0.0, enable_gradient=True, enable_tessellation=True, enable_fixed_connector_length=False, fixed_connector_length=7.5, enable_connector_gaps=False, connector_gap_ratio=0.0, gapped_rows=None, gapped_cols=None):
         self.scale = 3.7795275591  # 96 DPI scale for LightBurn (1mm = 3.7795px)
         self.cols = cols
         self.rows = rows
@@ -26,6 +26,12 @@ class VariableGeometryGenerator:
         self.enable_tessellation = enable_tessellation
         self.enable_fixed_connector_length = enable_fixed_connector_length
         self.fixed_connector_length = fixed_connector_length
+
+        self.enable_connector_gaps = enable_connector_gaps
+        self.connector_gap_ratio = connector_gap_ratio
+        self.gapped_rows = set(gapped_rows) if gapped_rows else set()
+        self.gapped_cols = set(gapped_cols) if gapped_cols else set()
+
         
         self.cell_widths = [self._calc_cell_size_x(c) for c in range(cols)]
         self.cell_heights = [self._calc_cell_size_y(r) for r in range(rows)]
@@ -48,6 +54,7 @@ class VariableGeometryGenerator:
         self.red_stroke_style = {'stroke': 'red', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
         self.green_stroke_style = {'stroke': 'blue', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
         self.blue_dashed_style = {'stroke': 'blue', 'stroke_width': 0.2 * self.scale, 'fill': 'none', 'stroke_dasharray': '3,3'}
+        self.debug_green_style = {'stroke': 'green', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
         self.sheet_style = {'stroke': 'blue', 'stroke_width': 0.4 * self.scale, 'fill': 'none'}
         
         self.offset_x = 0
@@ -297,6 +304,27 @@ class VariableGeometryGenerator:
             has_end_bridge = corner_bridges[(i + 1) % 4]
             has_mid_bridge = is_large and not edge_on_perim[i]
             
+            # Check if the adjacent connector is gapped. If so, suppress the mid-bridge.
+            if has_mid_bridge and self.enable_connector_gaps:
+                is_adjacent_gapped = False
+                # i=0: top edge, adjacent connector is vertical at (row-1, col)
+                if i == 0 and (col in self.gapped_cols):
+                    is_adjacent_gapped = True
+                # i=1: right edge, adjacent connector is horizontal at (row, col+1)
+                elif i == 1 and (row in self.gapped_rows):
+                    is_adjacent_gapped = True
+                # i=2: bottom edge, adjacent connector is vertical at (row+1, col)
+                elif i == 2 and (col in self.gapped_cols):
+                    is_adjacent_gapped = True
+                # i=3: left edge, adjacent connector is horizontal at (row, col-1)
+                elif i == 3 and (row in self.gapped_rows):
+                    is_adjacent_gapped = True
+                if is_adjacent_gapped:
+                    # This edge is complex and will be drawn cooperatively.
+                    # The large square will draw the bridged edge, and the connector will not.
+                    self._draw_cooperative_bridged_edge(p1, p2, i, row, col, style)
+                    continue # Skip the normal edge drawing logic.
+
             dx = p2[0] - p1[0]
             dy = p2[1] - p1[1]
             length = math.hypot(dx, dy)
@@ -324,6 +352,58 @@ class VariableGeometryGenerator:
                 self.draw_solid_line((p1[0] + ux * t_start, p1[1] + uy * t_start), 
                                      (p1[0] + ux * t_end, p1[1] + uy * t_end), style)
 
+    def _draw_cooperative_bridged_edge(self, p1, p2, edge_index, row, col, style):
+        """
+        Draws an edge of a large square adjacent to a gapped connector.
+        This creates two bridged sections for the connector pieces and a solid line for the gap.
+        """
+        dx, dy = p2[0] - p1[0], p2[1] - p1[1]
+        length = math.hypot(dx, dy)
+        if length < 1e-5: return
+        ux, uy = dx / length, dy / length
+
+        # Determine margin of the adjacent small square, which defines the connector's span.
+        is_inverted = style == self.green_stroke_style
+        
+        # edge_index: 0=top, 1=right, 2=bottom, 3=left
+        if edge_index == 0: # top edge, connector is vertical at (row-1, col)
+            m_adj_x, _ = self.get_margins(row - 2, col, is_inverted)
+            connector_inset = m_adj_x
+        elif edge_index == 1: # right edge, connector is horizontal at (row, col+1)
+            _, m_adj_y = self.get_margins(row, col + 2, is_inverted)
+            connector_inset = m_adj_y
+        elif edge_index == 2: # bottom edge, connector is vertical at (row+1, col)
+            m_adj_x, _ = self.get_margins(row + 2, col, is_inverted)
+            connector_inset = m_adj_x
+        else: # left edge, connector is horizontal at (row, col-1)
+            _, m_adj_y = self.get_margins(row, col - 2, is_inverted)
+            connector_inset = m_adj_y
+
+        connector_span = length - 2 * connector_inset
+        if connector_span <= 0: # No connector to draw if margins are too big
+            self.draw_solid_line(p1, p2, style)
+            return
+
+        gap_size = connector_span * self.connector_gap_ratio
+        piece_size = (connector_span - gap_size) / 2.0
+
+        # Define points along the edge from p1
+        d1 = connector_inset
+        d2 = d1 + piece_size
+        d3 = d2 + gap_size
+        d4 = d3 + piece_size
+
+        p_d1 = (p1[0] + ux * d1, p1[1] + uy * d1)
+        p_d2 = (p1[0] + ux * d2, p1[1] + uy * d2)
+        p_d3 = (p1[0] + ux * d3, p1[1] + uy * d3)
+        p_d4 = (p1[0] + ux * d4, p1[1] + uy * d4)
+
+        # Draw the 5 segments of the edge
+        self.draw_solid_line(p1, p_d1, style) # 1. Outer margin
+        self._draw_bridged_line(p_d1, p_d2, style) # 2. First connector piece
+        self.draw_solid_line(p_d2, p_d3, style) # 3. Gap
+        self._draw_bridged_line(p_d3, p_d4, style) # 4. Second connector piece
+        self.draw_solid_line(p_d4, p2, style) # 5. Inner margin
 
 class VariableTabbedGrid(VariableGeometryGenerator):
     def generate(self, show_base, show_top, show_red, show_grid, show_sheet=False, align_x=5.0, align_y=5.0, layout_mode="Overlaid"):
@@ -492,7 +572,9 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     m_right_x, m_right_y = self.get_margins(row, col + 1, is_inverted)
                     y1_L, y2_L = y + m_left_y, y + cell_h - m_left_y
                     y1_R, y2_R = y + m_right_y, y + cell_h - m_right_y
-
+                    
+                    is_gapped = self.enable_connector_gaps and row in self.gapped_rows
+                    
                     left_is_large = (row // 2 + (col - 1) // 2) % 2 == 0
                     if is_inverted: left_is_large = not left_is_large
 
@@ -504,16 +586,47 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                         end_x = x + cell_w - m_right_x
                     else:
                         end_x = x + cell_w
+                    start_x = x if left_is_large else (x + m_left_x)
+                    end_x = (x + cell_w - m_right_x) if left_is_large else (x + cell_w)
 
-                    if left_is_large:
-                        self.draw_solid_line((x, y1_L), (end_x, y1_R), style)
-                        self.draw_solid_line((end_x, y1_R), (end_x, y2_R), style)
-                        self.draw_solid_line((end_x, y2_R), (x, y2_L), style)
-                    else:
-                        start_x = x if self.enable_fixed_connector_length else x + m_left_x
-                        self.draw_solid_line((start_x, y1_L), (end_x, y1_R), style)
-                        self.draw_solid_line((start_x, y1_L), (start_x, y2_L), style)
-                        self.draw_solid_line((start_x, y2_L), (end_x, y2_R), style)
+                    if is_gapped:
+                        gap_size_L = (y2_L - y1_L) * self.connector_gap_ratio
+                        y_mid1_L = y1_L + (y2_L - y1_L - gap_size_L) / 2
+                        y_mid2_L = y_mid1_L + gap_size_L
+
+                        gap_size_R = (y2_R - y1_R) * self.connector_gap_ratio
+                        y_mid1_R = y1_R + (y2_R - y1_R - gap_size_R) / 2
+                        y_mid2_R = y_mid1_R + gap_size_R
+
+                        # The large square will draw the complex shared edge.
+                        # The connector draws its other 3 sides for each piece.
+                        if left_is_large:
+                            # Top piece
+                            self.draw_solid_line((start_x, y1_L), (end_x, y1_R), style)
+                            self.draw_solid_line((end_x, y1_R), (end_x, y_mid1_R), style)
+                            self.draw_solid_line((end_x, y_mid1_R), (start_x, y_mid1_L), style)
+                            # Bottom piece
+                            self.draw_solid_line((start_x, y_mid2_L), (end_x, y_mid2_R), style)
+                            self.draw_solid_line((end_x, y_mid2_R), (end_x, y2_R), style)
+                            self.draw_solid_line((end_x, y2_R), (start_x, y2_L), style)
+                        else: # Right side is large
+                            # Top piece
+                            self.draw_solid_line((start_x, y1_L), (end_x, y1_R), style)
+                            self.draw_solid_line((start_x, y1_L), (start_x, y_mid1_L), style)
+                            self.draw_solid_line((start_x, y_mid1_L), (end_x, y_mid1_R), style)
+                            # Bottom piece
+                            self.draw_solid_line((start_x, y_mid2_L), (end_x, y_mid2_R), style)
+                            self.draw_solid_line((start_x, y_mid2_L), (start_x, y2_L), style)
+                            self.draw_solid_line((start_x, y2_L), (end_x, y2_R), style)
+                    else: # Default solid connector
+                        if left_is_large:
+                            self.draw_solid_line((x, y1_L), (end_x, y1_R), style)
+                            self.draw_solid_line((end_x, y1_R), (end_x, y2_R), style)
+                            self.draw_solid_line((end_x, y2_R), (x, y2_L), style)
+                        else:
+                            self.draw_solid_line((start_x, y1_L), (end_x, y1_R), style)
+                            self.draw_solid_line((start_x, y1_L), (start_x, y2_L), style)
+                            self.draw_solid_line((start_x, y2_L), (end_x, y2_R), style)
 
                 elif row % 2 != 0 and col % 2 == 0:
                     m_top_x, m_top_y = self.get_margins(row - 1, col, is_inverted)
@@ -521,30 +634,70 @@ class VariableTabbedGrid(VariableGeometryGenerator):
                     x1_T, x2_T = x + m_top_x, x + cell_w - m_top_x
                     x1_B, x2_B = x + m_bottom_x, x + cell_w - m_bottom_x
 
+                    is_gapped = self.enable_connector_gaps and col in self.gapped_cols
+
                     top_is_large = ((row - 1) // 2 + col // 2) % 2 == 0
                     if is_inverted: top_is_large = not top_is_large
 
-                    # When fixed connector length is enabled, connectors span the full cell height
-                    # (which is now set to fixed_connector_length for odd rows)
-                    if self.enable_fixed_connector_length:
-                        end_y = y + cell_h
-                    elif top_is_large:
-                        end_y = y + cell_h - m_bottom_y
-                    else:
-                        end_y = y + cell_h
+                    start_y = y if top_is_large else (y + m_top_y)
+                    end_y = (y + cell_h - m_bottom_y) if top_is_large else (y + cell_h)
 
-                    if top_is_large:
-                        self.draw_solid_line((x1_T, y), (x1_B, end_y), style)
-                        self.draw_solid_line((x2_T, y), (x2_B, end_y), style)
-                        self.draw_solid_line((x1_B, end_y), (x2_B, end_y), style)
-                    else:
-                        start_y = y if self.enable_fixed_connector_length else y + m_top_y
-                        self.draw_solid_line((x1_T, start_y), (x1_B, end_y), style)
-                        self.draw_solid_line((x2_T, start_y), (x2_B, end_y), style)
-                        self.draw_solid_line((x1_T, start_y), (x2_T, start_y), style)
+                    if is_gapped:
+                        gap_size_T = (x2_T - x1_T) * self.connector_gap_ratio
+                        x_mid1_T = x1_T + (x2_T - x1_T - gap_size_T) / 2
+                        x_mid2_T = x_mid1_T + gap_size_T
+
+                        gap_size_B = (x2_B - x1_B) * self.connector_gap_ratio
+                        x_mid1_B = x1_B + (x2_B - x1_B - gap_size_B) / 2
+                        x_mid2_B = x_mid1_B + gap_size_B
+
+                        # The large square will draw the complex shared edge.
+                        # The connector draws its other 3 sides for each piece.
+                        if top_is_large:
+                            # Left piece
+                            self.draw_solid_line((x1_T, start_y), (x1_B, end_y), style)
+                            self.draw_solid_line((x1_B, end_y), (x_mid1_B, end_y), style)
+                            self.draw_solid_line((x_mid1_B, end_y), (x_mid1_T, start_y), style)
+                            # Right piece
+                            self.draw_solid_line((x_mid2_T, start_y), (x_mid2_B, end_y), style)
+                            self.draw_solid_line((x_mid2_B, end_y), (x2_B, end_y), style)
+                            self.draw_solid_line((x2_B, end_y), (x2_T, start_y), style)
+                        else: # Bottom side is large
+                            # Left piece
+                            self.draw_solid_line((x1_T, start_y), (x1_B, end_y), style)
+                            self.draw_solid_line((x1_T, start_y), (x_mid1_T, start_y), style)
+                            self.draw_solid_line((x_mid1_T, start_y), (x_mid1_B, end_y), style)
+                            # Right piece
+                            self.draw_solid_line((x_mid2_T, start_y), (x_mid2_B, end_y), style)
+                            self.draw_solid_line((x_mid2_T, start_y), (x2_T, start_y), style)
+                            self.draw_solid_line((x2_T, start_y), (x2_B, end_y), style)
+                    else: # Default solid connector
+                        if top_is_large:
+                            self.draw_solid_line((x1_T, y), (x1_B, end_y), style)
+                            self.draw_solid_line((x2_T, y), (x2_B, end_y), style)
+                            self.draw_solid_line((x1_B, end_y), (x2_B, end_y), style)
+                        else:
+                            self.draw_solid_line((x1_T, start_y), (x1_B, end_y), style)
+                            self.draw_solid_line((x2_T, start_y), (x2_B, end_y), style)
+                            self.draw_solid_line((x1_T, start_y), (x2_T, start_y), style)
 
                 elif row % 2 != 0 and col % 2 != 0:
                     self._draw_x_tabs(x, y, row, col, is_inverted, style)
+
+    def _draw_bridged_line(self, p1, p2, style):
+        """Draws a line with a gap in the middle for the center piece, and bridges for outer pieces."""
+        dx, dy = p2[0] - p1[0], p2[1] - p1[1]
+        length = math.hypot(dx, dy)
+        if length < 1e-5: return
+        ux, uy = dx / length, dy / length
+
+        t_mid_left = (length / 2.0) - (self.bridge_size / 2.0)
+        t_mid_right = (length / 2.0) + (self.bridge_size / 2.0)
+        
+        if 0 < t_mid_left:
+            self.draw_solid_line(p1, (p1[0] + ux * t_mid_left, p1[1] + uy * t_mid_left), style)
+        if t_mid_right < length:
+            self.draw_solid_line((p1[0] + ux * t_mid_right, p1[1] + uy * t_mid_right), p2, style)
 
     def _draw_x_tabs(self, x, y, row, col, is_inverted, style):
         d_center_x = self.normal_gap_x
@@ -584,11 +737,13 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         cx = x + cell_w / 2
         cy = y + cell_h / 2
 
+        # Top-left to bottom-right diagonal connections
         self.draw_solid_line((tl_x, tl_y - m_tl_y), (cx, cy - d_center_y), style, apply_clip=False)
         self.draw_solid_line((cx + d_center_x, cy), (br_x + m_br_x, br_y), style, apply_clip=False)
         self.draw_solid_line((tl_x - m_tl_x, tl_y), (cx - d_center_x, cy), style, apply_clip=False)
         self.draw_solid_line((cx, cy + d_center_y), (br_x, br_y + m_br_y), style, apply_clip=False)
 
+        # Bottom-left to top-right diagonal connections
         self.draw_solid_line((bl_x - m_bl_x, bl_y), (cx - d_center_x, cy), style, apply_clip=False)
         self.draw_solid_line((cx, cy - d_center_y), (tr_x, tr_y - m_tr_y), style, apply_clip=False)
         self.draw_solid_line((bl_x, bl_y + m_bl_y), (cx, cy + d_center_y), style, apply_clip=False)
@@ -751,8 +906,13 @@ class VariableTabbedGrid(VariableGeometryGenerator):
 
         for row in range(self.rows):
             for col in range(self.cols):
-                if row % 2 != 0 and col % 2 != 0:
+                if row % 2 != 0 and col % 2 != 0: # Intersection cells
                     self._draw_red_cutout(self.cell_x[col], self.cell_y[row], row, col, is_red_layer)
+                elif self.enable_connector_gaps:
+                    if row % 2 == 0 and col % 2 != 0 and row in self.gapped_rows: # Gapped horizontal connector
+                        self._draw_red_gap_cutout(self.cell_x[col], self.cell_y[row], row, col, is_horizontal=True)
+                    elif row % 2 != 0 and col % 2 == 0 and col in self.gapped_cols: # Gapped vertical connector
+                        self._draw_red_gap_cutout(self.cell_x[col], self.cell_y[row], row, col, is_horizontal=False)
 
         if shrink_top_row or shrink_bottom_row or shrink_left_col or shrink_right_col:
             shrunk_points = [_maybe_shrink_point(point) for point in points]
@@ -771,35 +931,30 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         if shrink_right_col:
             self.draw_solid_line((max_x, min_y), (max_x, max_y), self.blue_dashed_style, apply_clip=False)
 
+    def _draw_red_gap_cutout(self, x, y, row, col, is_horizontal):
+        cell_w = self.cell_widths[col]
+        cell_h = self.cell_heights[row]
+
+        if is_horizontal:
+            gap_size = cell_h * self.connector_gap_ratio
+            y_start = y + (cell_h - gap_size) / 2.0
+            points = [
+                (x, y_start), (x + cell_w, y_start), (x + cell_w, y_start + gap_size), (x, y_start + gap_size)
+            ]
+        else: # Vertical
+            gap_size = cell_w * self.connector_gap_ratio
+            x_start = x + (cell_w - gap_size) / 2.0
+            points = [
+                (x_start, y), (x_start + gap_size, y), (x_start + gap_size, y + cell_h), (x_start, y + cell_h)
+            ]
+        self.draw_polygon(points, self.red_stroke_style)
+
     def _draw_red_cutout(self, x, y, row, col, is_red_layer):
         cell_w = self.cell_widths[col]
         cell_h = self.cell_heights[row]
         
-        is_tl_large = ((row - 1) // 2 + (col - 1) // 2) % 2 == 0
-        is_tr_large = ((row - 1) // 2 + (col + 1) // 2) % 2 == 0
-        is_bl_large = ((row + 1) // 2 + (col - 1) // 2) % 2 == 0
-        is_br_large = ((row + 1) // 2 + (col + 1) // 2) % 2 == 0
-
-        m_tl_x, m_tl_y = self.get_margins(row - 1, col - 1, is_red_layer=is_red_layer)
-        m_tr_x, m_tr_y = self.get_margins(row - 1, col + 1, is_red_layer=is_red_layer)
-        m_bl_x, m_bl_y = self.get_margins(row + 1, col - 1, is_red_layer=is_red_layer)
-        m_br_x, m_br_y = self.get_margins(row + 1, col + 1, is_red_layer=is_red_layer)
-
-        P_T1 = (x, y - m_tl_y) if is_tl_large else (x + m_tl_x, y - m_tl_y)
-        P_T2 = (x + cell_w - m_tr_x, y - m_tr_y) if is_tr_large else (x + cell_w, y - m_tr_y)
-        
-        P_B1 = (x, y + cell_h + m_bl_y) if is_bl_large else (x + m_bl_x, y + cell_h + m_bl_y)
-        P_B2 = (x + cell_w - m_br_x, y + cell_h + m_br_y) if is_br_large else (x + cell_w, y + cell_h + m_br_y)
-        
-        P_L1 = (x - m_tl_x, y) if is_tl_large else (x - m_tl_x, y + m_tl_y)
-        P_L2 = (x - m_bl_x, y + cell_h - m_bl_y) if is_bl_large else (x - m_bl_x, y + cell_h)
-        
-        P_R1 = (x + cell_w + m_tr_x, y) if is_tr_large else (x + cell_w + m_tr_x, y + m_tr_y)
-        P_R2 = (x + cell_w + m_br_x, y + cell_h - m_br_y) if is_br_large else (x + cell_w + m_br_x, y + cell_h)
-
-        v_tl = self._line_intersection(P_T1, P_T2, P_L1, P_L2)
-        v_tr = self._line_intersection(P_T1, P_T2, P_R1, P_R2)
-        v_bl = self._line_intersection(P_B1, P_B2, P_L1, P_L2)
-        v_br = self._line_intersection(P_B1, P_B2, P_R1, P_R2)
-
-        self.draw_polygon([v_tl, v_tr, v_br, v_bl], self.red_stroke_style)
+        # For the red layer, the cutout is a simple rectangle covering the connector cell
+        points = [
+            (x, y), (x + cell_w, y), (x + cell_w, y + cell_h), (x, y + cell_h)
+        ]
+        self.draw_polygon(points, self.red_stroke_style)
