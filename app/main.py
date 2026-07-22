@@ -50,19 +50,26 @@ if enable_curvature:
     max_h = max(start_cell_size, end_cell_size_y)
 
     st.sidebar.subheader("Curvature")
-    normal_gap_x = st.sidebar.slider("Bottom Layer Vertical Gap (mm)", 0.0, float(max_w), 3.0, 0.1)
-    normal_gap_y = st.sidebar.slider("Bottom Layer Horizontal Gap (mm)", 0.0, float(max_h), 3.0, 0.1)
-    alt_gap_x = st.sidebar.slider("Top Layer Vertical Gap (mm)", 0.0, float(max_w), 1.0, 0.1)
-    alt_gap_y = st.sidebar.slider("Top Layer Horizontal Gap (mm)", 0.0, float(max_h), 1.0, 0.1)
+    normal_gap_y = st.sidebar.slider("Bottom Layer Vertical Gap (mm)", 0.0, float(max_h), 3.0, 0.1)
+    normal_gap_x = st.sidebar.slider("Bottom Layer Horizontal Gap (mm)", 0.0, float(max_w), 3.0, 0.1)
+    alt_gap_y = st.sidebar.slider("Top Layer Vertical Gap (mm)", 0.0, float(max_h), 1.0, 0.1)
+    alt_gap_x = st.sidebar.slider("Top Layer Horizontal Gap (mm)", 0.0, float(max_w), 1.0, 0.1)
 
-    st.sidebar.subheader("S-Curve Gap Transition")
-    s_curve_axis = st.sidebar.selectbox("Transition Axis", ["X", "Y"])
-    max_point = int(cols) if s_curve_axis == "X" else int(rows)
-    label_point = "Transition Column" if s_curve_axis == "X" else "Transition Row"
-    s_curve_point = st.sidebar.number_input(label_point, min_value=0, max_value=max_point, value=max_point // 2)
-    s_curve_cells = st.sidebar.number_input("Transition Cells (Width of S-Curve)", min_value=0, max_value=max_point, value=min(3, max_point))
-    max_t_gap = max_w if s_curve_axis == "X" else max_h
-    s_curve_transition_gap = st.sidebar.slider("Transition Gap (mm)", 0.0, float(max_t_gap), 2.0, 0.1)
+    enable_s_curve = st.sidebar.checkbox("Enable S-Curve Transition", value=False)
+    if enable_s_curve:
+        st.sidebar.subheader("S-Curve Gap Transition")
+        s_curve_axis = st.sidebar.selectbox("Transition Axis", ["X", "Y"])
+        max_point = int(cols) if s_curve_axis == "X" else int(rows)
+        label_point = "Transition Column" if s_curve_axis == "X" else "Transition Row"
+        s_curve_point = st.sidebar.number_input(label_point, min_value=0, max_value=max_point, value=max_point // 2)
+        s_curve_cells = st.sidebar.number_input("Transition Cells (Width of S-Curve)", min_value=0, max_value=max_point, value=min(3, max_point))
+        max_t_gap = max_w if s_curve_axis == "X" else max_h
+        s_curve_transition_gap = st.sidebar.slider("Transition Gap (mm)", 0.0, float(max_t_gap), 2.0, 0.1)
+    else:
+        s_curve_axis = "None"
+        s_curve_point = 0
+        s_curve_cells = 0
+        s_curve_transition_gap = 0.0
 else:
     uniform_gap = st.sidebar.slider("Gap Size (mm)", 0.0, float(max(start_cell_size, end_cell_size_x, end_cell_size_y)), 3.0, 0.1)
     normal_gap_x = uniform_gap
@@ -449,4 +456,3 @@ with col2:
     st.markdown("### Pattern Alignment on Sheet")
     st.number_input("X Offset (mm)", value=5.0, step=1.0, key="align_x")
     st.number_input("Y Offset (mm)", value=5.0, step=1.0, key="align_y")
-
