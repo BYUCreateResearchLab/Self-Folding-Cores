@@ -953,8 +953,37 @@ class VariableTabbedGrid(VariableGeometryGenerator):
         cell_w = self.cell_widths[col]
         cell_h = self.cell_heights[row]
         
-        # For the red layer, the cutout is a simple rectangle covering the connector cell
+        # Get margins from the 4 surrounding large/small squares for both top and bottom layers.
+        # Top-left square
+        mx_tl_base, my_tl_base = self.get_margins(row - 1, col - 1, is_inverted=False)
+        mx_tl_top, my_tl_top = self.get_margins(row - 1, col - 1, is_inverted=True)
+        # Top-right square
+        mx_tr_base, my_tr_base = self.get_margins(row - 1, col + 1, is_inverted=False)
+        mx_tr_top, my_tr_top = self.get_margins(row - 1, col + 1, is_inverted=True)
+        # Bottom-left square
+        mx_bl_base, my_bl_base = self.get_margins(row + 1, col - 1, is_inverted=False)
+        mx_bl_top, my_bl_top = self.get_margins(row + 1, col - 1, is_inverted=True)
+        # Bottom-right square
+        mx_br_base, my_br_base = self.get_margins(row + 1, col + 1, is_inverted=False)
+        mx_br_top, my_br_top = self.get_margins(row + 1, col + 1, is_inverted=True)
+
+        # To make the cutout large enough, we need to expand it by the smallest margin found.
+        # Smallest margin -> largest tab protrusion.
+        
+        # Horizontal expansion is determined by vertical connectors.
+        # We need the x-margins of the squares they connect.
+        margin_left = min(mx_tl_base, mx_tl_top, mx_bl_base, mx_bl_top)
+        margin_right = min(mx_tr_base, mx_tr_top, mx_br_base, mx_br_top)
+
+        # Vertical expansion is determined by horizontal connectors.
+        # We need the y-margins.
+        margin_top = min(my_tl_base, my_tl_top, my_tr_base, my_tr_top)
+        margin_bottom = min(my_bl_base, my_bl_top, my_br_base, my_br_top)
+        
         points = [
-            (x, y), (x + cell_w, y), (x + cell_w, y + cell_h), (x, y + cell_h)
+            (x - margin_left, y - margin_top),
+            (x + cell_w + margin_right, y - margin_top),
+            (x + cell_w + margin_right, y + cell_h + margin_bottom),
+            (x - margin_left, y + cell_h + margin_bottom)
         ]
         self.draw_polygon(points, self.red_stroke_style)

@@ -37,7 +37,7 @@ for state_key, default_value in [
     ("alt_gap_x", 1.0),
     ("alt_gap_y", 1.0),
     ("uniform_gap", 3.0),
-    ("bridge_size", 0.8),
+    ("bridge_size", 1.0),
     ("enable_connector_gaps", False),
     ("connector_gap_ratio", 1.0/3.0),
     ("gapped_rows_str", "1,3,5"),
