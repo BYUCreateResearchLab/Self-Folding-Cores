@@ -55,7 +55,7 @@ class VariableGeometryGenerator:
         self.green_stroke_style = {'stroke': 'blue', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
         self.blue_dashed_style = {'stroke': 'blue', 'stroke_width': 0.2 * self.scale, 'fill': 'none', 'stroke_dasharray': '3,3'}
         self.debug_green_style = {'stroke': 'green', 'stroke_width': 0.2 * self.scale, 'fill': 'none'}
-        self.sheet_style = {'stroke': 'blue', 'stroke_width': 0.4 * self.scale, 'fill': 'none'}
+        self.sheet_style = {'stroke': '#FFA500', 'stroke_width': 0.4 * self.scale, 'fill': 'none'}
         
         self.offset_x = 0
         self.offset_y = 0
