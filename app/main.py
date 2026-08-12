@@ -113,7 +113,7 @@ gapped_cols_str = st.session_state.gapped_cols_str if enable_connector_gaps else
 gapped_rows = [int(i.strip()) for i in gapped_rows_str.split(',') if i.strip().isdigit()]
 gapped_cols = [int(i.strip()) for i in gapped_cols_str.split(',') if i.strip().isdigit()]
 st.sidebar.subheader("Gradient")
-enable_gradient = st.sidebar.checkbox("Enable Gradient (Varying Cell Sizes)", key="enable_gradient", value=True)
+enable_gradient = st.sidebar.checkbox("Enable Gradient (Varying Cell Sizes)", key="enable_gradient", value=False)
 
 if enable_gradient:
     end_cell_size_x = st.sidebar.number_input("End Cell Size X (Bottom-Right) (mm)", min_value=1.0, max_value=100.0, value=end_cell_size_x, key="end_cell_size_x")
@@ -139,7 +139,7 @@ else:
     max_h = start_cell_size
 
 st.sidebar.subheader("Tessellation")
-enable_tessellation = st.sidebar.checkbox("Enable Tessellation (Edge Splitting)", key="enable_tessellation", value=True)
+enable_tessellation = st.sidebar.checkbox("Enable Tessellation (Edge Splitting)", key="enable_tessellation", value=False)
 
 tessellation_position = st.session_state.get("tessellation_position", 9)
 tessellation_tolerance = st.session_state.get("tess_tol", 0.0)
